@@ -9,7 +9,9 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.openstack4j.api.OSClient;
+import org.openstack4j.core.transport.Config;
 import org.openstack4j.openstack.OSFactory;
+
 
 public class Osp4jSession {
     private static final Properties configprop = new Properties();
@@ -42,14 +44,12 @@ public class Osp4jSession {
     }
     public static OSClient getOspSession(){
         if(configprop.size()>1){
-            String sslEnabled=configprop.getProperty("OS_ENABLE_SSL");
-            Boolean isSSLEnabled = new Boolean(sslEnabled); 
-            String loggingEnabled= configprop.getProperty("OS_ENABLE_LOGGING");
+            String loggingEnabled = configprop.getProperty("OS_ENABLE_LOGGING");
             Boolean isLoggingEnabled=new Boolean(loggingEnabled);
             if(isLoggingEnabled){
                 enableLogging();
             }
-            final OSClient os = OSFactory.builder().endpoint(configprop.getProperty("OS_AUTH_URL")).credentials(configprop.getProperty("OS_USERNAME"), configprop.getProperty("OS_PASSWORD")).tenantId(configprop.getProperty("OS_TENANT_ID")).useNonStrictSSLClient(isSSLEnabled).authenticate();
+            final OSClient os = buildOSClient();
             if(os==null){
                 System.err.println("Please verify the config passed");
             }
@@ -60,6 +60,21 @@ public class Osp4jSession {
         }
     }
     
+    private static OSClient buildOSClient() {
+        OSClient os=null;
+        String sslEnabled=configprop.getProperty("OS_ENABLE_SSL");
+        Boolean isSSLEnabled = new Boolean(sslEnabled); 
+        String modifyHttpConfig = configprop.getProperty("OS_MODIFY_HTTP_CONFIG");
+        Boolean ismodifyHttpConfig=new Boolean(modifyHttpConfig); 
+        if(ismodifyHttpConfig){ 
+            System.out.println("with config");
+            Config config=Config.newConfig().withMaxConnectionsPerRoute(Integer.parseInt(configprop.getProperty("OS_MAX_ROUTE_CONNECTION"))).withMaxConnections(Integer.parseInt(configprop.getProperty("OS_MAX_CONNECTION")));
+            os = OSFactory.builder().withConfig(config).endpoint(configprop.getProperty("OS_AUTH_URL")).credentials(configprop.getProperty("OS_USERNAME"), configprop.getProperty("OS_PASSWORD")).tenantId(configprop.getProperty("OS_TENANT_ID")).useNonStrictSSLClient(isSSLEnabled).authenticate();
+        }else{
+           os = OSFactory.builder().endpoint(configprop.getProperty("OS_AUTH_URL")).credentials(configprop.getProperty("OS_USERNAME"), configprop.getProperty("OS_PASSWORD")).tenantId(configprop.getProperty("OS_TENANT_ID")).useNonStrictSSLClient(isSSLEnabled).authenticate();
+        }
+        return os;
+    }
     public static void enableLogging(){
       System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
       System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");

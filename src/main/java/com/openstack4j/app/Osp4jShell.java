@@ -5,7 +5,6 @@ package com.openstack4j.app;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -340,12 +339,12 @@ public class Osp4jShell {
         System.out.println("File name should end with '.properties'");
         System.out.println("Example entries expected:");
         System.out.println("");
-        System.out.println("OS_AUTH_URL=https://us-texas-3.cloud.cisco.com:5000/v2.0");
-        System.out.println("OS_TENANT_ID=0de6cb222d814ac9b4d9bd85b9739402");
-        System.out.println("OS_TENANT_NAME=CVG-DEV1");
-        System.out.println("OS_USERNAME=cvg4-tx3.gen");
-        System.out.println("OS_PASSWORD=8d6febbcf16f41c1ba474926581b64f5");
-        System.out.println("OS_REGION_NAME=us-texas-3");
+        System.out.println("OS_AUTH_URL=https://[URL]:5000/v2.0");
+        System.out.println("OS_TENANT_ID=afafagagag");
+        System.out.println("OS_TENANT_NAME=PROJECT_NAME");
+        System.out.println("OS_USERNAME=username");
+        System.out.println("OS_PASSWORD=password");
+        System.out.println("OS_REGION_NAME=region");
         System.out.println("OS_ENABLE_SSL=true");
         System.out.println("OS_ENABLE_LOGGING=false");
     }
