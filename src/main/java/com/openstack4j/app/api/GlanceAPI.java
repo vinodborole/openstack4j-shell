@@ -4,11 +4,15 @@
 package com.openstack4j.app.api;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
+import org.openstack4j.api.image.ImageService;
 import org.openstack4j.model.common.Payload;
 import org.openstack4j.model.common.Payloads;
 import org.openstack4j.model.image.ContainerFormat;
@@ -17,10 +21,7 @@ import org.openstack4j.model.image.Image;
 
 import com.openstack4j.app.Osp4jSession;
 
-/**
- * @author Cisco Systems, Inc
- *
- */
+
 public class GlanceAPI { 
     public static Image imageCreate(String imagePath, String name, String version) throws IOException {
       System.out.println("imagePath: "+imagePath+", ImageName: "+name +", Upload Version: "+version);
@@ -37,17 +38,12 @@ public class GlanceAPI {
       }
       // Upload Version - 2 
       if("2".equalsIgnoreCase(version)){
-        System.out.println("upload version - 2");
-        System.out.println("uploading directly...");
-        System.out.println("file: " + imagePath + "/" + name);
-        final Payload<File> payload = Payloads.create(new File(imagePath + "/" + name));
-        System.out.println("payload: " + payload.open().available());
-        return os.images().upload("ictmp", payload, null);
+        System.out.println("not supported!");
       }
       // Upload Version -3
       if("3".equalsIgnoreCase(version)){
           System.out.println("upload version - 3");
-          final Payload<File> payload = Payloads.create(new File(imagePath + "/" + name));
+          final Payload<File> payload = Payloads.create(new File(imagePath));
           System.out.println("payload: " + payload.open().available());
           Image image = Builders.image().name(name).containerFormat(ContainerFormat.BARE).diskFormat(DiskFormat.QCOW2).build();
           System.out.println("image: " + image.toString());
@@ -64,4 +60,7 @@ public class GlanceAPI {
         final List<? extends Image> images = os.images().list();
         return images;
     }
+    
+
+    
 }

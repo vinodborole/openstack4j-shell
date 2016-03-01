@@ -17,14 +17,12 @@ import org.openstack4j.model.identity.Tenant;
 import org.openstack4j.model.image.Image;
 
 import com.google.common.base.Strings;
+import com.openstack4j.app.api.CommonAPI;
 import com.openstack4j.app.api.GlanceAPI;
 import com.openstack4j.app.api.NeutronAPI;
 import com.openstack4j.app.api.NovaAPI;
 
-/**
- * @author Cisco Systems, Inc
- *
- */
+
 public class Osp4jShell {
     public static void main(String[] args) throws java.io.IOException {
      if(args.length>0 && !Strings.isNullOrEmpty(args[0]) && args[0].equalsIgnoreCase("testsuite")){
@@ -46,8 +44,8 @@ public class Osp4jShell {
              executeShell(console, false);
          }
      }
-      
-    }
+  }
+    
     /**
      * @author viborole
      */
@@ -153,6 +151,12 @@ public class Osp4jShell {
                             System.out.println(response);
                         }
                         break;
+                        case IMAGE_CREATE:
+                        {
+                            String imageId=NovaAPI.createSnapshot(params.get(2),params.get(3));
+                            System.out.println("Snapshoted image ID: "+imageId);
+                        }
+                        break;
                         case FLAVOR_LIST:
                         {
                             NovaAPI.listflavor();
@@ -176,11 +180,6 @@ public class Osp4jShell {
                         case STATUS:
                         {
                             NovaAPI.status(params.get(2));
-                        }
-                        break;
-                        case FLUSH:
-                        {
-                            NovaAPI.flushMemory();
                         }
                         break;
                         case HELP:
@@ -234,6 +233,12 @@ public class Osp4jShell {
                             }
                         }
                         break;
+                        case IMAGE_DOWNLOAD:
+                        { 
+                            boolean status=CommonAPI.downloadImage(params.get(2), params.get(3), params.get(4));
+                            System.out.println("Download status: "+status); 
+                        }
+                        break;
                         case HELP:
                         {
                             glanceHelp();
@@ -242,6 +247,11 @@ public class Osp4jShell {
                         case NULL:
                             System.err.println("Invaid command");
                     }
+                }
+                break;
+                case FLUSH:
+                {
+                    ShellContext.getContext().getShellMemory().flushMemory();
                 }
                 break;
                 case LOGGING_YES:
@@ -293,6 +303,7 @@ public class Osp4jShell {
         System.out.println("help");
         System.out.println("logging-yes");
         System.out.println("logging-no");
+        System.out.println("flush");
         System.out.println("source <config.properties full path>");
         System.out.println("exit");
         System.out.println("run testsuite <filePath>");
@@ -313,6 +324,7 @@ public class Osp4jShell {
         System.out.println("glance help");
         System.out.println("glance image-list");
         System.out.println("glance image-create <imagePath> <name> <version[1|2|3]>");
+        System.out.println("glance image-download <imageId> <downloadlocation> <name>");
         
     }
     
@@ -326,7 +338,6 @@ public class Osp4jShell {
         System.out.println("nova boot <imageId> <flavorId> <netId> <name>");
         System.out.println("nova delete <serverId>");
         System.out.println("nova status <serverId>");
-        System.out.println("nova flush");
     }
     
     private static void neutronHelp() {
@@ -363,6 +374,7 @@ public class Osp4jShell {
         GLANCE("glance"),
         IMAGE_LIST("image-list"),
         IMAGE_CREATE("image-create"),
+        IMAGE_DOWNLOAD("image-download"),
         HELP("help"),
         LOGGING_YES("logging-yes"),
         LOGGING_NO("logging-no"), 

@@ -41,9 +41,7 @@ import org.openstack4j.openstack.OSFactory;
 
 import com.google.common.base.Strings;
 
-/**
- * @author Cisco Systems, Inc
- */
+
 public class Osp4jApp {
 
     /**
@@ -97,33 +95,7 @@ public class Osp4jApp {
 //        
     }
 
-    private static void downloadImage(OSClient os,String imageId, String localDirToDownload) throws IOException{
-        java.util.Date date= new java.util.Date();
-        Timestamp ts=new Timestamp(date.getTime());
-        ImageService imgService= os.images();
-        Image image=imgService.get(imageId);
-        if(image!=null){
-            System.out.println("image info: "+image.toString());
-            InputStream is =imgService.getAsStream(imageId);
-            if(is!=null){
-                String downLoadFileName = localDirToDownload + File.separator + "testImage_"+ ts + ".qcow2";
-                FileOutputStream outputStream = new FileOutputStream(new File(downLoadFileName));
-                int read = 0;
-                final byte[] bytes = new byte[1048576];
-                while ((read = is.read(bytes)) != -1) {
-                    outputStream.write(bytes, 0, read);
-                    outputStream.flush();
-                } 
-                System.out.println("download complete.."+ downLoadFileName);
-            }else{
-                System.out.println("Download error.. inputstream is null");
-            }
-        }else{
-            System.out.println("Image with ID "+imageId+" not found!");
-        }
-        
-    }
-    
+   
     private static void createSecurityRule(OSClient os) {
         
     }

@@ -76,6 +76,7 @@ public class Osp4jSession {
         return os;
     }
     public static void enableLogging(){
+      OSFactory.enableHttpLoggingFilter(true);
       System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
       System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
       System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "DEBUG");
