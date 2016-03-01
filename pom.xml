@@ -6,6 +6,8 @@
   <name>openstack4j-shell</name>
   <description>openstack4j-shell</description>
   <dependencies>
+  
+  
 <dependency>
   <groupId>org.pacesys</groupId>
   <artifactId>openstack4j-core</artifactId>
@@ -13,12 +15,13 @@
 </dependency>
 
 <!-- Osp4j Connectors -->
-  
+   
 <dependency>
 	<groupId>org.pacesys.openstack4j.connectors</groupId>
 	<artifactId>openstack4j-jersey2</artifactId>
 	<version>2.10</version> 
 </dependency>
+ 
   
 <!--
 <dependency>
@@ -62,11 +65,19 @@
 	<version>2.10</version>
 </dependency>
 -->
+<!--  
 <dependency>
 	<groupId>org.bouncycastle</groupId>
 	<artifactId>bcprov-jdk16</artifactId>
 	<version>1.45</version>
 </dependency> 
+-->
+<dependency>
+	<groupId>org.apache.commons</groupId>
+	<artifactId>commons-lang3</artifactId>
+	<version>3.0</version>
+</dependency>
+
   </dependencies>
   <repositories>
     <repository>

@@ -4,15 +4,11 @@
 package com.openstack4j.app.api;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Timestamp;
 import java.util.List;
 
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
-import org.openstack4j.api.image.ImageService;
 import org.openstack4j.model.common.Payload;
 import org.openstack4j.model.common.Payloads;
 import org.openstack4j.model.image.ContainerFormat;
@@ -20,6 +16,7 @@ import org.openstack4j.model.image.DiskFormat;
 import org.openstack4j.model.image.Image;
 
 import com.openstack4j.app.Osp4jSession;
+import com.openstack4j.app.utils.TableBuilder;
 
 
 public class GlanceAPI { 
@@ -53,6 +50,11 @@ public class GlanceAPI {
       }
     return null;
   }
+    
+    public static Image getImageDetail(String imageId){
+        OSClient os=Osp4jSession.getOspSession();
+        return os.images().get(imageId);
+    }
      
     
     public static List<? extends Image> imageList(){
@@ -61,6 +63,27 @@ public class GlanceAPI {
         return images;
     }
     
+    public static void printImagesDetails(List<? extends Image> images){
+        TableBuilder tb=getTableBuilder();
+        for (final Image image : images ) {
+            addImageRow(tb,image);
+        }
+        System.out.println(tb.toString());
+    }
 
-    
+    public static void printImageDetails(Image image){
+        TableBuilder tb = getTableBuilder();
+        addImageRow(tb,image);
+        System.out.println(tb.toString());
+    }
+        
+    private static TableBuilder getTableBuilder() {
+        TableBuilder tb = new TableBuilder();
+        tb.addRow("Image Id", "Image Name", "Image Status","Image Size","Container Format");
+        tb.addRow("--------","-----------","-------------","-----------","-----------------");
+        return tb;
+     }
+    private static void addImageRow(TableBuilder tb,Image image){
+        tb.addRow(image.getId(),image.getName(),image.getStatus().toString(),image.getSize().toString(),image.getContainerFormat().toString());
+    }
 }

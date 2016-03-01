@@ -21,6 +21,7 @@ import com.openstack4j.app.api.CommonAPI;
 import com.openstack4j.app.api.GlanceAPI;
 import com.openstack4j.app.api.NeutronAPI;
 import com.openstack4j.app.api.NovaAPI;
+import com.openstack4j.app.utils.TableBuilder;
 
 
 public class Osp4jShell {
@@ -46,7 +47,7 @@ public class Osp4jShell {
      }
   }
     
-    /**
+    /** 
      * @author viborole
      */
     private static void executeShell(BufferedReader console,boolean isTestSuite) {
@@ -118,9 +119,9 @@ public class Osp4jShell {
                         {
                             ActionResponse response = NovaAPI.startVM(params.get(2));
                             if(response.isSuccess()){
-                                System.out.println("Success!");
+                                NovaAPI.printServerDetails(NovaAPI.getServer(params.get(2)));
                             }else{
-                                System.err.println("Failure!");
+                                System.err.println("Failure!"); 
                             }
                             
                         }
@@ -129,7 +130,7 @@ public class Osp4jShell {
                         {
                             boolean response = NovaAPI.stopVM(params.get(2));
                             if(response){
-                                System.out.println("Success!");
+                                NovaAPI.printServerDetails(NovaAPI.getServer(params.get(2)));
                             }else{
                                 System.err.println("Failure!");
                             }
@@ -139,7 +140,7 @@ public class Osp4jShell {
                         {
                             ActionResponse response = NovaAPI.restartVM(params.get(2));
                             if(response.isSuccess()){
-                                System.out.println("Success!");
+                                NovaAPI.printServerDetails(NovaAPI.getServer(params.get(2)));
                             }else{
                                 System.err.println("Failure!");
                             }
@@ -154,7 +155,7 @@ public class Osp4jShell {
                         case IMAGE_CREATE:
                         {
                             String imageId=NovaAPI.createSnapshot(params.get(2),params.get(3));
-                            System.out.println("Snapshoted image ID: "+imageId);
+                            GlanceAPI.printImageDetails(GlanceAPI.getImageDetail(imageId));
                         }
                         break;
                         case FLAVOR_LIST:
@@ -164,14 +165,15 @@ public class Osp4jShell {
                         break;
                         case BOOT:
                         {
-                            NovaAPI.boot(params.get(2),params.get(3),params.get(4),params.get(5));
+                           String serverId= NovaAPI.boot(params.get(2),params.get(3),params.get(4),params.get(5));
+                           NovaAPI.printServerDetails(NovaAPI.getServer(serverId));
                         }
                         break;
                         case DELETE:
                         {
                             ActionResponse response=NovaAPI.delete(params.get(2));
                             if(response.isSuccess()){
-                                System.out.println("Success!");
+                                NovaAPI.printServerDetails(NovaAPI.getServer(params.get(2)));
                             }else{
                                 System.err.println("Failure!");
                             }
@@ -217,17 +219,15 @@ public class Osp4jShell {
                     switch(subcommand!=null?subcommand:subcommand.NULL){
                         case IMAGE_LIST:
                         {
-                            List<? extends Image> images= GlanceAPI.imageList();
-                            for (final Image image : images ) {
-                                System.out.println(image.getId()+","+image.getName()+","+image.getContainerFormat());
-                            }
+                           List<? extends Image> images= GlanceAPI.imageList();
+                           GlanceAPI.printImagesDetails(images);
                         }
                         break;
                         case IMAGE_CREATE:
                         {
                             Image image= GlanceAPI.imageCreate(params.get(2), params.get(3), params.get(4));
                             if(image!=null){
-                                System.out.println("image details -  "+image.getId()+","+image.getName()+","+image.getDiskFormat().toString());
+                                GlanceAPI.printImageDetails(image);
                             }else{
                                 System.err.println("Upload failed");
                             }
