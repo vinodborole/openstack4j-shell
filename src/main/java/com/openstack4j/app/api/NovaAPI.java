@@ -1,84 +1,86 @@
 package com.openstack4j.app.api;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.compute.FlavorService;
-import org.openstack4j.api.image.ImageService;
 import org.openstack4j.model.compute.Action;
 import org.openstack4j.model.compute.ActionResponse;
+import org.openstack4j.model.compute.Addresses;
 import org.openstack4j.model.compute.Flavor;
+import org.openstack4j.model.compute.Image;
 import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.compute.Server.Status;
 import org.openstack4j.model.compute.ServerCreate;
+import org.openstack4j.model.compute.builder.BlockDeviceMappingBuilder;
 import org.openstack4j.model.compute.builder.ServerCreateBuilder;
-import org.openstack4j.model.image.Image;
+import org.openstack4j.model.storage.block.VolumeSnapshot;
 
 import com.openstack4j.app.Osp4jSession;
+import com.openstack4j.app.api.CinderAPI.CinderKey;
+import com.openstack4j.app.api.GlanceAPI.GlanceKey;
+import com.openstack4j.app.utils.TableBuilder;
 
 public class NovaAPI {
 
-    private enum NovaKey{
-        SERVERID;
+    protected enum NovaKey{
+        NOVA_SERVERID;
     }
-    private static Map<NovaKey, String> novaMemory= new HashMap<NovaKey, String>();
-    
-    public static void addToMemory(NovaKey key, String value){
-        novaMemory.put(key, value);
-    }
-    public static String getFromMemory(NovaKey key){
-        return novaMemory.get(key);
-    }
-    public static void removeFromMemory(NovaKey key){
-        novaMemory.remove(key);
-    }
-    public static void flushMemory(){
-        Iterator<NovaKey> entriesIterator = novaMemory.keySet().iterator();
-        while (entriesIterator.hasNext()) {
-            novaMemory.remove(entriesIterator.next().toString());
-        } 
-    }
-    
+   
     public static ActionResponse startVM(String serverId){
         OSClient os=Osp4jSession.getOspSession();
-        serverId=takeFromMemory(NovaKey.SERVERID,serverId);
+        serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
         return os.compute().servers().action(serverId, Action.START);
     }
-    private static String takeFromMemory(NovaKey key , String serverId) {
-        if(serverId.equalsIgnoreCase("$")){
-            return getFromMemory(key);
-        }else{
-            return serverId;
-        }
-    }
+
     public static boolean stopVM(String serverId){
         OSClient os=Osp4jSession.getOspSession();
-        serverId=takeFromMemory(NovaKey.SERVERID,serverId);
+        serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
         os.compute().servers().action(serverId, Action.STOP);
         return waitUntilServerSHUTOFF(os,serverId);
     }
     public static ActionResponse restartVM(String serverId){
-        serverId=takeFromMemory(NovaKey.SERVERID,serverId);
+        serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
         stopVM(serverId);
         return startVM(serverId);
     }
-    public static boolean downloadVM(String serverId, String downloadLocation,String name){
+    public static boolean downloadVM(String serverId, String downloadLocation,String name) throws Exception{
         stopVM(serverId);
-        OSClient os=Osp4jSession.getOspSession();
-        serverId=takeFromMemory(NovaKey.SERVERID,serverId);
-        String imageId = os.compute().servers().createSnapshot(serverId, name);
-        waitUntilImageACTIVE(os,imageId);
-        boolean response= downloadImage(imageId, downloadLocation, name);
+        String imageId=createSnapshot(serverId, name);
+        boolean response= CommonAPI.downloadImage(imageId, downloadLocation, name);
         startVM(serverId);
         return response;
+    }
+    
+    public static Server getServer(String serverId) {
+        OSClient os=Osp4jSession.getOspSession();
+        return os.compute().servers().get(serverId);
+    }
+
+    public static List<? extends Server> listServers(){
+        OSClient os=Osp4jSession.getOspSession();
+        List<? extends Server> servers=os.compute().servers().list();
+        return servers;
+    }
+    
+    public static String createSnapshot(String serverId , String name) throws Exception{
+        OSClient os=Osp4jSession.getOspSession();
+        serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
+        Server server=os.compute().servers().get(serverId);
+        String imageId = os.compute().servers().createSnapshot(serverId, name);
+        waitUntilImageACTIVE(os,imageId); 
+        Map<String,String> metadata=server.getMetadata();
+        Boolean bootFromVolume=new Boolean(metadata.get("BOOT_FROM_VOLUME"));
+        System.out.println(bootFromVolume);
+        if(bootFromVolume){
+            CinderAPI.getVolumeSnapshot(metadata.get("VOLUME_ID"));
+        }
+        
+        return imageId;
     }
     private static void waitUntilImageACTIVE(OSClient os,String imageId) {
         System.out.println("wait until image is ACTIVE..");
@@ -96,61 +98,38 @@ public class NovaAPI {
         }
     }
     
-    public static boolean downloadImage(String imageId, String downloadLocation, String name){
-        OSClient os=Osp4jSession.getOspSession();
-        ImageService imgService= os.images();
-        Image image=imgService.get(imageId);
-        if(image!=null){
-            System.out.println("image info: "+image.toString());
-            InputStream is =imgService.getAsStream(imageId);
-            if(is!=null){
-                try{
-                    String downLoadFileName = downloadLocation + File.separator + name + ".qcow2";
-                    FileOutputStream outputStream = new FileOutputStream(new File(downLoadFileName));
-                    int read = 0;
-                    final byte[] bytes = new byte[1048576];
-                    while ((read = is.read(bytes)) != -1) {
-                        outputStream.write(bytes, 0, read);
-                        outputStream.flush();
-                    } 
-                    System.out.println("download complete.."+ downLoadFileName);
-                    return true;
-                }catch(Exception e){
-                    System.err.println("Exception : "+e.getMessage());
-                    return false;
-                }
-            }else{
-                System.err.println("Download error.. inputstream is null");
-                return false;
-            }
-        }else{
-            System.err.println("Image with ID "+imageId+" not found!");
-            return false;
-        }
-    }
     public static void listflavor(){
         OSClient os=Osp4jSession.getOspSession();
         FlavorService flavorService = os.compute().flavors();
         List<? extends Flavor> flavorList = flavorService.list();
-        for (Flavor flavor : flavorList) {
-            System.out.println(flavor.getId()+", "+flavor.getDisk()+","+flavor.getRam()+","+flavor.getVcpus()+","+flavor.getName());
-        }
+        printFlavorsDetails(flavorList);
     }
-    public static void boot(String imageId, String flavorId, String netId, String name) {
-        System.out.println("booting vm...");
+    public static String boot(String imageOrVolumeId, String flavorId, String netId, String name, boolean bootfromVolume) {
         OSClient os=Osp4jSession.getOspSession();
         List<String> netList = new ArrayList<String>();
         netList.add(netId);
-        ServerCreateBuilder builder = Builders.server().name(name).image(imageId).flavor(flavorId).networks(netList);;
+        ServerCreateBuilder builder = null; 
+        Map<String,String> metadata = new HashMap<String,String>();
+        if(bootfromVolume){
+            imageOrVolumeId=CommonAPI.takeFromMemory(CinderKey.VOLUME_ID, imageOrVolumeId);
+            metadata.put("BOOT_FROM_VOLUME", "true");
+            metadata.put("VOLUME_ID", imageOrVolumeId);
+            builder = Builders.server().name(name).flavor(flavorId).addMetadata(metadata).networks(netList);
+            BlockDeviceMappingBuilder blockDeviceMappingBuilder = Builders.blockDeviceMapping().uuid(imageOrVolumeId).deviceName("/dev/vda").bootIndex(0).deleteOnTermination(true);
+            builder.blockDevice(blockDeviceMappingBuilder.build());
+        }else{
+            metadata.put("BOOT_FROM_VOLUME", "false");
+            imageOrVolumeId=CommonAPI.takeFromMemory(GlanceKey.IMAGE_ID, imageOrVolumeId);
+            builder = Builders.server().name(name).image(imageOrVolumeId).flavor(flavorId).networks(netList).addMetadata(metadata);
+        }
         ServerCreate serverOptions = builder.build();
         Server server = os.compute().servers().boot(serverOptions);
-        System.out.println("saving to memory..");
-        addToMemory(NovaKey.SERVERID, server.getId());
+        CommonAPI.addToMemory(NovaKey.NOVA_SERVERID, server.getId());
         waitUntilServerActive(os,server.getId()); 
-        System.out.println("server created");
+        printServerDetails(os.compute().servers().get(server.getId()));
+        return server.getId();
     }
     private static void waitUntilServerActive(OSClient os,String serverId) {
-        System.out.println("wait until ACTIVE..");
         while(true){
             Status status =  os.compute().servers().get(serverId).getStatus();
             System.out.println("current status: "+status.toString());
@@ -164,8 +143,24 @@ public class NovaAPI {
             }
         }
     }
+    private static void waitUntilServerDeleted(OSClient os, String serverId){
+        while(true){
+            Server server=os.compute().servers().get(serverId);
+            Server.Status status=Status.DELETED;
+            if(server!=null)
+                status=server.getStatus();
+            System.out.println("current status: "+status.toString());
+            if(status.equals(Status.DELETED)){
+                break; 
+            }else{
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+    }
     private static boolean waitUntilServerSHUTOFF(OSClient os,String serverId) {
-        System.out.println("wait until SHUTOFF..");
         while(true){
             Status status =  os.compute().servers().get(serverId).getStatus();
             System.out.println("current status: "+status.toString());
@@ -180,15 +175,80 @@ public class NovaAPI {
         }
         return true;
     }
-    public static ActionResponse delete(String serverId) {
+    public static void delete(String serverId) {
         OSClient os=Osp4jSession.getOspSession();
-        serverId=takeFromMemory(NovaKey.SERVERID,serverId);
-        return os.compute().servers().delete(serverId);
+        serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
+        os.compute().servers().delete(serverId);
+        waitUntilServerDeleted(os,serverId);
     }
     public static void status(String serverId) {
         OSClient os=Osp4jSession.getOspSession();
-        serverId=takeFromMemory(NovaKey.SERVERID,serverId);
+        serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
         Server server=os.compute().servers().get(serverId);
-        System.out.println("status: "+server.getStatus());
+        printServerDetails(server);
     }
+    
+    public static void printFlavorsDetails(List<? extends Flavor> flavors){
+        TableBuilder tb=getTableBuilder("Flavor");
+        for (final Flavor flavor : flavors) {
+            addFlavorRow(tb, flavor);
+        }
+        System.out.println(tb.toString());
+        System.out.println("TOTAL RECORDS: "+tb.totalrecords());
+    }
+    public static void printFlavorDetails(Flavor flavor){
+        TableBuilder tb=getTableBuilder("Flavor");
+        addFlavorRow(tb, flavor);
+        System.out.println(tb.toString());
+        System.out.println("TOTAL RECORDS: "+tb.totalrecords());
+    }    
+    public static void printServersDetails(List<? extends Server> servers){
+        TableBuilder tb=getTableBuilder("Server");
+        for (final Server server : servers ) {
+            addServerRow(tb,server);
+        }
+        System.out.println(tb.toString());
+        System.out.println("TOTAL RECORDS: "+tb.totalrecords());
+    }
+
+    public static void printServerDetails(Server server){
+        TableBuilder tb = getTableBuilder("Server");
+        addServerRow(tb,server);
+        System.out.println(tb.toString());
+        System.out.println("TOTAL RECORDS: "+tb.totalrecords());
+    }
+        
+    private static TableBuilder getTableBuilder(String type) {
+        TableBuilder tb = new TableBuilder();
+        if(type.equals("Server")){
+        tb.addRow("Server Id", "Server Name", "Image Name","Flavor","Status","Power State","AccessIPV4", "AccessIPV6", "Addresses","Metadata");
+        tb.addRow("--------", "-------------","----------","------","------","------------","----------","-----------","-----------","----------");
+        }
+        else if(type.equals("Flavor")){
+            tb.addRow("Flavor Id", "Disk", "Ram", "VCPU","Name");
+            tb.addRow("---","-----","----","-----","-------");
+        }
+        return tb;
+     }
+    
+    private static void addFlavorRow(TableBuilder tb, Flavor flavor){
+        tb.addRow(flavor.getId(),String.valueOf(flavor.getDisk()),String.valueOf(flavor.getRam()),String.valueOf(flavor.getVcpus()),flavor.getName());
+    }
+    private static void addServerRow(TableBuilder tb,Server server){
+        String metadata="";
+        String imageName="";
+        String addresses="";
+        Map<String,String> metadataMap=server.getMetadata();
+        if(metadataMap!=null && !metadataMap.isEmpty())
+            metadata=metadataMap.toString();
+        Image image=server.getImage();
+        if(image!=null)
+            imageName=image.getName();
+        Addresses addressesobj= server.getAddresses();
+        if(addresses!=null)
+            addresses=addressesobj.toString();
+        tb.addRow(server.getId(),server.getName(),imageName,server.getFlavor().getName(),server.getStatus().toString(),server.getPowerState(),server.getAccessIPv4(),server.getAccessIPv6(),addresses,metadata);
+    }
+    
+    
 }

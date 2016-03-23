@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.model.common.Payload;
@@ -16,52 +17,99 @@ import org.openstack4j.model.image.DiskFormat;
 import org.openstack4j.model.image.Image;
 
 import com.openstack4j.app.Osp4jSession;
+import com.openstack4j.app.utils.TableBuilder;
 
-/**
- * @author Cisco Systems, Inc
- *
- */
+
 public class GlanceAPI { 
-    public static Image imageCreate(String imagePath, String name, String version) throws IOException {
-      System.out.println("imagePath: "+imagePath+", ImageName: "+name +", Upload Version: "+version);
-      // Upload Version - 1
-      OSClient os=Osp4jSession.getOspSession();
-      if("1".equalsIgnoreCase(version)){
-        System.out.println("upload version - 1");
-        System.out.println("Reserve image...");
-       Image image = os.images().reserve(Builders.image().name(name).build());
-        System.out.println("Uploading  image: " + name);
-        final Payload<File> payload = Payloads.create(new File(imagePath));
-        image = image.toBuilder().containerFormat(ContainerFormat.BARE).diskFormat(DiskFormat.QCOW2).build();
-       return os.images().upload(image.getId(), payload, image);
-      }
-      // Upload Version - 2 
-      if("2".equalsIgnoreCase(version)){
-        System.out.println("upload version - 2");
-        System.out.println("uploading directly...");
-        System.out.println("file: " + imagePath + "/" + name);
-        final Payload<File> payload = Payloads.create(new File(imagePath + "/" + name));
-        System.out.println("payload: " + payload.open().available());
-        return os.images().upload("ictmp", payload, null);
-      }
-      // Upload Version -3
-      if("3".equalsIgnoreCase(version)){
-          System.out.println("upload version - 3");
-          final Payload<File> payload = Payloads.create(new File(imagePath + "/" + name));
-          System.out.println("payload: " + payload.open().available());
-          Image image = Builders.image().name(name).containerFormat(ContainerFormat.BARE).diskFormat(DiskFormat.QCOW2).build();
-          System.out.println("image: " + image.toString());
-          System.out.println("Upload Complete...");
-          System.out.println("Size: " + image.getSize() + ",Status :" + image.getStatus() + ",DiskFormat :" + image.getDiskFormat());
-          return image = os.images().create(image, payload);
-      }
-    return null;
-  }
-     
     
+    protected enum GlanceKey{
+        IMAGE_ID;
+    }
+    
+    public static Image imageCreate(String imagePath, String name) throws IOException {
+    OSClient os=Osp4jSession.getOspSession();
+    Image image = os.images().reserve(Builders.image().name(name).build());
+    File file = new File(imagePath);
+    final Payload<File> payload = Payloads.create(file);
+    image = image.toBuilder().containerFormat(ContainerFormat.BARE).diskFormat(DiskFormat.QCOW2).build();
+    try{
+        image= os.images().upload(image.getId(), payload, image);   
+    }catch(MessageBodyProviderNotFoundException e){
+        image=os.images().get(image.getId());
+        if(image.getStatus().equals(Image.Status.ACTIVE) && file.length()==image.getSize()){
+            //success
+        }else{
+            System.out.println("Upload failed!");
+            return image;
+        }
+    }
+    System.out.println("Upload success!");
+    CommonAPI.addToMemory(GlanceKey.IMAGE_ID, image.getId());
+    return image;
+  }
+    
+    public static boolean monitorImageUpload(final String imageId) throws Exception {
+        boolean isActive = false;
+        final Image Img = Osp4jSession.getOspSession().images().get(imageId);
+        while (!isActive) {
+            isActive = isImageActive(Osp4jSession.getOspSession(), imageId);
+        }
+        return isActive;
+    }
+
+    private static boolean isImageActive(OSClient os, final String imageId) throws Exception {
+        final Image Img = os.images().get(imageId);
+        Image.Status status = Img.getStatus();
+        System.out.println("current Image status: "+status.toString());
+        if ((Image.Status.ACTIVE.equals(status))) {
+            return true;
+        } else {
+            Thread.sleep(10000);
+        }
+        return false;
+    }
+    
+    public static Image getImageDetail(String imageId){
+        imageId=CommonAPI.takeFromMemory(GlanceKey.IMAGE_ID,imageId);
+        OSClient os=Osp4jSession.getOspSession();
+        return os.images().get(imageId);
+    }
+     
+    public static void delete(String id) {
+        OSClient os=Osp4jSession.getOspSession();
+        os.images().delete(id);
+    }      
     public static List<? extends Image> imageList(){
         OSClient os=Osp4jSession.getOspSession();
         final List<? extends Image> images = os.images().list();
         return images;
     }
+    
+    public static void printImagesDetails(List<? extends Image> images){
+        TableBuilder tb=getImageTableBuilder();
+        for (final Image image : images ) {
+            addImageRow(tb,image);
+        }
+        System.out.println(tb.toString());
+        System.out.println("TOTAL RECORDS: "+tb.totalrecords());
+    }
+
+    public static void printImageDetails(Image image){
+        TableBuilder tb = getImageTableBuilder();
+        addImageRow(tb,image);
+        System.out.println(tb.toString());
+        System.out.println("TOTAL RECORDS: "+tb.totalrecords());
+    }
+        
+    private static TableBuilder getImageTableBuilder() {
+        TableBuilder tb = new TableBuilder();
+        tb.addRow("Image Id", "Image Name", "Image Status","Image Size","Container Format", "Is Public");
+        tb.addRow("--------","-----------","-------------","-----------","-----------------","----------");
+        return tb;
+     }
+    private static void addImageRow(TableBuilder tb,Image image){
+        tb.addRow(image.getId(),image.getName(),image.getStatus().toString(),image.getSize().toString(),image.getContainerFormat().toString(),String.valueOf(image.isPublic()));
+    }
+
+  
 }
