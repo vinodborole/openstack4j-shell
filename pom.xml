@@ -11,7 +11,7 @@
 <dependency>
   <groupId>org.pacesys</groupId>
   <artifactId>openstack4j-core</artifactId>
-  <version>2.10</version>
+  <version>2.20-SNAPSHOT</version>
 </dependency>
 
 <!-- Osp4j Connectors -->
@@ -19,7 +19,7 @@
 <dependency>
 	<groupId>org.pacesys.openstack4j.connectors</groupId>
 	<artifactId>openstack4j-jersey2</artifactId>
-	<version>2.10</version> 
+	<version>2.20-SNAPSHOT</version> 
 </dependency>
  
   

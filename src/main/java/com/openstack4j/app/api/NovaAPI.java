@@ -1,23 +1,28 @@
 package com.openstack4j.app.api;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.compute.FlavorService;
 import org.openstack4j.model.compute.Action;
 import org.openstack4j.model.compute.ActionResponse;
+import org.openstack4j.model.compute.Addresses;
 import org.openstack4j.model.compute.Flavor;
-import org.openstack4j.model.compute.FloatingIP;
+import org.openstack4j.model.compute.Image;
 import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.compute.Server.Status;
 import org.openstack4j.model.compute.ServerCreate;
+import org.openstack4j.model.compute.builder.BlockDeviceMappingBuilder;
 import org.openstack4j.model.compute.builder.ServerCreateBuilder;
-import org.openstack4j.model.network.Network;
-import org.openstack4j.openstack.compute.domain.NovaServer.Servers;
+import org.openstack4j.model.storage.block.VolumeSnapshot;
 
 import com.openstack4j.app.Osp4jSession;
+import com.openstack4j.app.api.CinderAPI.CinderKey;
+import com.openstack4j.app.api.GlanceAPI.GlanceKey;
 import com.openstack4j.app.utils.TableBuilder;
 
 public class NovaAPI {
@@ -43,7 +48,7 @@ public class NovaAPI {
         stopVM(serverId);
         return startVM(serverId);
     }
-    public static boolean downloadVM(String serverId, String downloadLocation,String name){
+    public static boolean downloadVM(String serverId, String downloadLocation,String name) throws Exception{
         stopVM(serverId);
         String imageId=createSnapshot(serverId, name);
         boolean response= CommonAPI.downloadImage(imageId, downloadLocation, name);
@@ -56,11 +61,25 @@ public class NovaAPI {
         return os.compute().servers().get(serverId);
     }
 
-    public static String createSnapshot(String serverId , String name){
+    public static List<? extends Server> listServers(){
+        OSClient os=Osp4jSession.getOspSession();
+        List<? extends Server> servers=os.compute().servers().list();
+        return servers;
+    }
+    
+    public static String createSnapshot(String serverId , String name) throws Exception{
         OSClient os=Osp4jSession.getOspSession();
         serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
+        Server server=os.compute().servers().get(serverId);
         String imageId = os.compute().servers().createSnapshot(serverId, name);
-        waitUntilImageACTIVE(os,imageId);
+        waitUntilImageACTIVE(os,imageId); 
+        Map<String,String> metadata=server.getMetadata();
+        Boolean bootFromVolume=new Boolean(metadata.get("BOOT_FROM_VOLUME"));
+        System.out.println(bootFromVolume);
+        if(bootFromVolume){
+            CinderAPI.getVolumeSnapshot(metadata.get("VOLUME_ID"));
+        }
+        
         return imageId;
     }
     private static void waitUntilImageACTIVE(OSClient os,String imageId) {
@@ -85,21 +104,32 @@ public class NovaAPI {
         List<? extends Flavor> flavorList = flavorService.list();
         printFlavorsDetails(flavorList);
     }
-    public static String boot(String imageId, String flavorId, String netId, String name) {
-        System.out.println("booting vm...");
+    public static String boot(String imageOrVolumeId, String flavorId, String netId, String name, boolean bootfromVolume) {
         OSClient os=Osp4jSession.getOspSession();
         List<String> netList = new ArrayList<String>();
         netList.add(netId);
-        ServerCreateBuilder builder = Builders.server().name(name).image(imageId).flavor(flavorId).networks(netList);;
+        ServerCreateBuilder builder = null; 
+        Map<String,String> metadata = new HashMap<String,String>();
+        if(bootfromVolume){
+            imageOrVolumeId=CommonAPI.takeFromMemory(CinderKey.VOLUME_ID, imageOrVolumeId);
+            metadata.put("BOOT_FROM_VOLUME", "true");
+            metadata.put("VOLUME_ID", imageOrVolumeId);
+            builder = Builders.server().name(name).flavor(flavorId).addMetadata(metadata).networks(netList);
+            BlockDeviceMappingBuilder blockDeviceMappingBuilder = Builders.blockDeviceMapping().uuid(imageOrVolumeId).deviceName("/dev/vda").bootIndex(0).deleteOnTermination(true);
+            builder.blockDevice(blockDeviceMappingBuilder.build());
+        }else{
+            metadata.put("BOOT_FROM_VOLUME", "false");
+            imageOrVolumeId=CommonAPI.takeFromMemory(GlanceKey.IMAGE_ID, imageOrVolumeId);
+            builder = Builders.server().name(name).image(imageOrVolumeId).flavor(flavorId).networks(netList).addMetadata(metadata);
+        }
         ServerCreate serverOptions = builder.build();
         Server server = os.compute().servers().boot(serverOptions);
-        System.out.println("saving to memory..");
         CommonAPI.addToMemory(NovaKey.NOVA_SERVERID, server.getId());
         waitUntilServerActive(os,server.getId()); 
+        printServerDetails(os.compute().servers().get(server.getId()));
         return server.getId();
     }
     private static void waitUntilServerActive(OSClient os,String serverId) {
-        System.out.println("wait until ACTIVE..");
         while(true){
             Status status =  os.compute().servers().get(serverId).getStatus();
             System.out.println("current status: "+status.toString());
@@ -113,8 +143,24 @@ public class NovaAPI {
             }
         }
     }
+    private static void waitUntilServerDeleted(OSClient os, String serverId){
+        while(true){
+            Server server=os.compute().servers().get(serverId);
+            Server.Status status=Status.DELETED;
+            if(server!=null)
+                status=server.getStatus();
+            System.out.println("current status: "+status.toString());
+            if(status.equals(Status.DELETED)){
+                break; 
+            }else{
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+    }
     private static boolean waitUntilServerSHUTOFF(OSClient os,String serverId) {
-        System.out.println("wait until SHUTOFF..");
         while(true){
             Status status =  os.compute().servers().get(serverId).getStatus();
             System.out.println("current status: "+status.toString());
@@ -129,10 +175,11 @@ public class NovaAPI {
         }
         return true;
     }
-    public static ActionResponse delete(String serverId) {
+    public static void delete(String serverId) {
         OSClient os=Osp4jSession.getOspSession();
         serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
-        return os.compute().servers().delete(serverId);
+        os.compute().servers().delete(serverId);
+        waitUntilServerDeleted(os,serverId);
     }
     public static void status(String serverId) {
         OSClient os=Osp4jSession.getOspSession();
@@ -147,11 +194,13 @@ public class NovaAPI {
             addFlavorRow(tb, flavor);
         }
         System.out.println(tb.toString());
+        System.out.println("TOTAL RECORDS: "+tb.totalrecords());
     }
     public static void printFlavorDetails(Flavor flavor){
         TableBuilder tb=getTableBuilder("Flavor");
         addFlavorRow(tb, flavor);
         System.out.println(tb.toString());
+        System.out.println("TOTAL RECORDS: "+tb.totalrecords());
     }    
     public static void printServersDetails(List<? extends Server> servers){
         TableBuilder tb=getTableBuilder("Server");
@@ -159,22 +208,24 @@ public class NovaAPI {
             addServerRow(tb,server);
         }
         System.out.println(tb.toString());
+        System.out.println("TOTAL RECORDS: "+tb.totalrecords());
     }
 
     public static void printServerDetails(Server server){
         TableBuilder tb = getTableBuilder("Server");
         addServerRow(tb,server);
         System.out.println(tb.toString());
+        System.out.println("TOTAL RECORDS: "+tb.totalrecords());
     }
         
     private static TableBuilder getTableBuilder(String type) {
         TableBuilder tb = new TableBuilder();
         if(type.equals("Server")){
-        tb.addRow("Server Id", "Server Name", "Image Name","Flavor","Status","Power State","AccessIPV4", "AccessIPV6", "Addresses");
-        tb.addRow("--------", "-------------","----------","------","------","------------","----------","-----------","-----------");
+        tb.addRow("Server Id", "Server Name", "Image Name","Flavor","Status","Power State","AccessIPV4", "AccessIPV6", "Addresses","Metadata");
+        tb.addRow("--------", "-------------","----------","------","------","------------","----------","-----------","-----------","----------");
         }
         else if(type.equals("Flavor")){
-            tb.addRow("Id", "Disk", "Ram", "VCPU","Name");
+            tb.addRow("Flavor Id", "Disk", "Ram", "VCPU","Name");
             tb.addRow("---","-----","----","-----","-------");
         }
         return tb;
@@ -184,7 +235,19 @@ public class NovaAPI {
         tb.addRow(flavor.getId(),String.valueOf(flavor.getDisk()),String.valueOf(flavor.getRam()),String.valueOf(flavor.getVcpus()),flavor.getName());
     }
     private static void addServerRow(TableBuilder tb,Server server){
-        tb.addRow(server.getId(),server.getName(),server.getImage().getName(),server.getFlavor().getName(),server.getStatus().toString(),server.getPowerState(),server.getAccessIPv4(),server.getAccessIPv6(),server.getAddresses().toString());
+        String metadata="";
+        String imageName="";
+        String addresses="";
+        Map<String,String> metadataMap=server.getMetadata();
+        if(metadataMap!=null && !metadataMap.isEmpty())
+            metadata=metadataMap.toString();
+        Image image=server.getImage();
+        if(image!=null)
+            imageName=image.getName();
+        Addresses addressesobj= server.getAddresses();
+        if(addresses!=null)
+            addresses=addressesobj.toString();
+        tb.addRow(server.getId(),server.getName(),imageName,server.getFlavor().getName(),server.getStatus().toString(),server.getPowerState(),server.getAccessIPv4(),server.getAccessIPv6(),addresses,metadata);
     }
     
     

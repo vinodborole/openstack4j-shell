@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import org.openstack4j.api.OSClient;
 import org.openstack4j.core.transport.Config;
+import org.openstack4j.model.common.Identifier;
 import org.openstack4j.openstack.OSFactory;
 
 
@@ -64,15 +65,15 @@ public class Osp4jSession {
         OSClient os=null;
         String sslEnabled=configprop.getProperty("OS_ENABLE_SSL");
         Boolean isSSLEnabled = new Boolean(sslEnabled); 
-        String modifyHttpConfig = configprop.getProperty("OS_MODIFY_HTTP_CONFIG");
-        Boolean ismodifyHttpConfig=new Boolean(modifyHttpConfig); 
-        if(ismodifyHttpConfig){ 
-            System.out.println("with config");
-            Config config=Config.newConfig().withMaxConnectionsPerRoute(Integer.parseInt(configprop.getProperty("OS_MAX_ROUTE_CONNECTION"))).withMaxConnections(Integer.parseInt(configprop.getProperty("OS_MAX_CONNECTION")));
-            os = OSFactory.builder().withConfig(config).endpoint(configprop.getProperty("OS_AUTH_URL")).credentials(configprop.getProperty("OS_USERNAME"), configprop.getProperty("OS_PASSWORD")).tenantId(configprop.getProperty("OS_TENANT_ID")).useNonStrictSSLClient(isSSLEnabled).authenticate();
-        }else{
-           os = OSFactory.builder().endpoint(configprop.getProperty("OS_AUTH_URL")).credentials(configprop.getProperty("OS_USERNAME"), configprop.getProperty("OS_PASSWORD")).tenantId(configprop.getProperty("OS_TENANT_ID")).useNonStrictSSLClient(isSSLEnabled).authenticate();
-        }
+        String v3Authentication=configprop.getProperty("OS_ENABLE_V3_AUTHENTICATION");
+        Boolean v3AuthenticationEnabled = new Boolean(v3Authentication);
+        if(v3AuthenticationEnabled)
+            os = OSFactory.builderV3().useNonStrictSSLClient(isSSLEnabled).scopeToProject(Identifier.byId(configprop.getProperty("OS_TENANT_ID")), Identifier.byName(configprop.getProperty("OS_DOMAIN")))
+                .credentials(configprop.getProperty("OS_USERNAME"), configprop.getProperty("OS_PASSWORD"), Identifier.byName(configprop.getProperty("OS_DOMAIN"))).endpoint(configprop.getProperty("OS_AUTH_URL"))
+                .authenticate();
+        else
+            os = OSFactory.builder().endpoint(configprop.getProperty("OS_AUTH_URL")).credentials(configprop.getProperty("OS_USERNAME"), configprop.getProperty("OS_PASSWORD")).tenantId(configprop.getProperty("OS_TENANT_ID")).useNonStrictSSLClient(isSSLEnabled).authenticate();
+        
         return os;
     }
     public static void enableLogging(){

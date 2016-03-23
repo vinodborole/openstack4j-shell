@@ -11,6 +11,10 @@ public class TableBuilder {
     public void addRow(String...cls){
         rows.add(cls);
     }
+    public int totalrecords()
+    {
+        return rows.size()-2;
+    }
     private int[] colWidths(){
         int cols = -1;
         for(String[] row : rows){

@@ -15,6 +15,7 @@ import org.openstack4j.model.image.Image;
 
 import com.openstack4j.app.Osp4jSession;
 import com.openstack4j.app.ShellContext;
+import com.openstack4j.app.api.GlanceAPI.GlanceKey;
 
 public class CommonAPI {
       
@@ -37,9 +38,11 @@ public class CommonAPI {
             return serverId;
         }
     }
+
     public static boolean downloadImage(String imageId, String downloadLocation, String name){
         OSClient os=Osp4jSession.getOspSession();
         ImageService imgService= os.images();
+        imageId=takeFromMemory(GlanceKey.IMAGE_ID, imageId);
         Image image=imgService.get(imageId);
         if(image!=null){
             System.out.println("image info: "+image.toString());
