@@ -1,4 +1,4 @@
-package com.openstack4j.app.api;
+package com.vinodborole.openstack4j.app.api;
 
 import java.util.List;
 import java.util.Set;
@@ -12,7 +12,7 @@ import org.openstack4j.model.network.SecurityGroup;
 import org.openstack4j.model.network.SecurityGroupRule;
 import org.openstack4j.model.storage.block.VolumeSnapshot;
 
-import com.openstack4j.app.model.NetworkModel;
+import com.vinodborole.openstack4j.app.model.NetworkModel;
 
 public class TenantAPI {
     /**

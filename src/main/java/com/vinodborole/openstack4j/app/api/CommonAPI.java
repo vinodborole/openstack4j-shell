@@ -1,7 +1,7 @@
 /**
  * @author viborole
  */
-package com.openstack4j.app.api;
+package com.vinodborole.openstack4j.app.api;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,9 +13,9 @@ import org.openstack4j.api.OSClient;
 import org.openstack4j.api.image.ImageService;
 import org.openstack4j.model.image.Image;
 
-import com.openstack4j.app.Osp4jSession;
-import com.openstack4j.app.ShellContext;
-import com.openstack4j.app.api.GlanceAPI.GlanceKey;
+import com.vinodborole.openstack4j.app.Osp4jSession;
+import com.vinodborole.openstack4j.app.ShellContext;
+import com.vinodborole.openstack4j.app.api.GlanceAPI.GlanceKey;
 
 public class CommonAPI {
       

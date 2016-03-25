@@ -1,7 +1,7 @@
 /**
  * @author viborole
  */
-package com.openstack4j.app;
+package com.vinodborole.openstack4j.app;
 
 import java.io.BufferedReader;
 import java.io.Console;
@@ -20,13 +20,13 @@ import org.openstack4j.model.identity.Tenant;
 import org.openstack4j.model.image.Image;
 
 import com.google.common.base.Strings;
-import com.openstack4j.app.api.CinderAPI;
-import com.openstack4j.app.api.CommonAPI;
-import com.openstack4j.app.api.GlanceAPI;
-import com.openstack4j.app.api.NeutronAPI;
-import com.openstack4j.app.api.NovaAPI;
-import com.openstack4j.app.api.TenantAPI;
-import com.openstack4j.app.utils.TableBuilder;
+import com.vinodborole.openstack4j.app.api.CinderAPI;
+import com.vinodborole.openstack4j.app.api.CommonAPI;
+import com.vinodborole.openstack4j.app.api.GlanceAPI;
+import com.vinodborole.openstack4j.app.api.NeutronAPI;
+import com.vinodborole.openstack4j.app.api.NovaAPI;
+import com.vinodborole.openstack4j.app.api.TenantAPI;
+import com.vinodborole.openstack4j.app.utils.TableBuilder;
 
 
 public class Osp4jShell {

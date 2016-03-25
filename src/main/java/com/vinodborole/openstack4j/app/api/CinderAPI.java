@@ -1,4 +1,4 @@
-package com.openstack4j.app.api;
+package com.vinodborole.openstack4j.app.api;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,10 +21,10 @@ import org.openstack4j.model.storage.block.VolumeSnapshot;
 import org.openstack4j.model.storage.block.VolumeUploadImage;
 import org.openstack4j.model.storage.block.options.UploadImageData;
 
-import com.openstack4j.app.Osp4jSession;
-import com.openstack4j.app.api.GlanceAPI.GlanceKey;
-import com.openstack4j.app.api.NovaAPI.NovaKey;
-import com.openstack4j.app.utils.TableBuilder;
+import com.vinodborole.openstack4j.app.Osp4jSession;
+import com.vinodborole.openstack4j.app.api.GlanceAPI.GlanceKey;
+import com.vinodborole.openstack4j.app.api.NovaAPI.NovaKey;
+import com.vinodborole.openstack4j.app.utils.TableBuilder;
 
 public class CinderAPI {
 

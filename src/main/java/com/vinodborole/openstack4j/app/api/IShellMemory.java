@@ -1,7 +1,7 @@
 /**
  * @author viborole
  */
-package com.openstack4j.app.api;
+package com.vinodborole.openstack4j.app.api;
 
 
 public interface IShellMemory<T> {

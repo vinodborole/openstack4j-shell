@@ -1,10 +1,10 @@
 /**
  * @author viborole
  */
-package com.openstack4j.app;
+package com.vinodborole.openstack4j.app;
 
-import com.openstack4j.app.api.IShellMemory;
-import com.openstack4j.app.api.ShellMemoryImpl;
+import com.vinodborole.openstack4j.app.api.IShellMemory;
+import com.vinodborole.openstack4j.app.api.ShellMemoryImpl;
 
 
 public class ShellContext<T> {

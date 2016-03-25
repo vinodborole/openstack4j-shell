@@ -1,7 +1,7 @@
 /**
  * @author viborole
  */
-package com.openstack4j.app;
+package com.vinodborole.openstack4j.app;
 
 import java.io.FileInputStream;
 import java.io.IOException;

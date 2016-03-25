@@ -1,4 +1,4 @@
-package com.openstack4j.app.model;
+package com.vinodborole.openstack4j.app.model;
 
 import java.util.List;
 
