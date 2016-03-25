@@ -1,14 +1,14 @@
-source C:\Users\viborole\Documents\cloudconnector\cirrus\osp4j_v2\src\main\resources\config.properties
+source C:\config.properties
 nova boot 434e4ff7-3230-411a-8942-cfb8e42c2c48 392af288-f5f9-4470-a296-b8790c80aadf 663afbd6-2e9f-4089-aab1-00ab37b25e64 testVM1
 nova status $
 nova stop $
-nova download $ C:\Users\viborole\Documents\cloudconnector\cirrus\osp4j_v2\src\main\resources\ testVM2-download
+nova download $ C:\resources\ testVM2-download
 nova delete $
 nova flush
 nova boot 434e4ff7-3230-411a-8942-cfb8e42c2c48 392af288-f5f9-4470-a296-b8790c80aadf 663afbd6-2e9f-4089-aab1-00ab37b25e64 testVM2
 nova status $
 nova stop $
-nova download $ C:\Users\viborole\Documents\cloudconnector\cirrus\osp4j_v2\src\main\resources\ testVM2-download
+nova download $ C:\resources\ testVM2-download
 nova delete $
 nova flush
 exit
