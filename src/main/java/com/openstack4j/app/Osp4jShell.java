@@ -4,8 +4,11 @@
 package com.openstack4j.app;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -27,14 +30,15 @@ import com.openstack4j.app.utils.TableBuilder;
 
 
 public class Osp4jShell {
-    public static void main(String[] args) throws java.io.IOException {
+    public static void main(String[] args) throws Exception {
      if(args.length>0 && !Strings.isNullOrEmpty(args[0]) && args[0].equalsIgnoreCase("testsuite")){
          if(!Strings.isNullOrEmpty(args[1])){
              File file = new File(args[1]);
              FileReader fileReader = new FileReader(file);
              BufferedReader console = new BufferedReader(fileReader);
              while (true) {
-                 executeShell(console, true);
+                 String commandLine = console.readLine();
+                 executeCommand(commandLine);
              }
          }else{
              System.out.println("Missing arguments, please use following command.");
@@ -42,23 +46,26 @@ public class Osp4jShell {
              System.exit(0);
          }
      }else{ 
-         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-         while (true) {
-             executeShell(console, false);
-         }
+             Console console=System.console();
+             if(console!=null){
+                 while (true) {
+                     executeShell(console);
+                 }
+             }else{
+                 System.out.println("No Console associated, Cannot execute the program!");
+             }
      }
   }
-    
+    private static void executeShell(Console console){
+        System.out.print("osp>");
+        String commandLine = console.readLine();
+        executeCommand(commandLine);
+    }
     /** 
      * @author viborole
      */
-    private static void executeShell(BufferedReader console,boolean isTestSuite) {
-    String commandLine;
+    private static void executeCommand(String commandLine) {
     try{  
-           if(!isTestSuite)
-                 System.out.print("osp>");
-           
-            commandLine = console.readLine();
             if(commandLine==null){
                 System.exit(0);
             }else if (commandLine.equals("") || commandLine.startsWith("#")){
@@ -413,79 +420,95 @@ public class Osp4jShell {
 
     
     private static void allHelp(){
-        configFormat();
-        System.out.println("");
-        System.out.println("VALID COMMANDS");
-        System.out.println("--------------");
-        System.out.println("help");
-        System.out.println("logging-yes");
-        System.out.println("logging-no");
-        System.out.println("flush");
-        System.out.println("source <config.properties full path>");
-        System.out.println("exit");
-        printHelp();
-        glanceHelp();
-        novaHelp();
-        neutronHelp();
-        cinderHelp();
-        deleteHelp();
+        String helpdata=getHelpData().toString();
+        helpdata=helpdata.replace("<PRINT>", "");
+        helpdata=helpdata.replace("</PRINT>", "");
+        
+        helpdata=helpdata.replace("<NOVA>", "");
+        helpdata=helpdata.replace("</NOVA>", "");
+        
+        helpdata=helpdata.replace("<CINDER>", "");
+        helpdata=helpdata.replace("</CINDER>", "");
+
+        helpdata=helpdata.replace("<GLANCE>", "");
+        helpdata=helpdata.replace("</GLANCE>", "");
+        
+        helpdata=helpdata.replace("<NEUTRON>", "");
+        helpdata=helpdata.replace("</NEUTRON>", "");
+
+        helpdata=helpdata.replace("<BASIC>", "");
+        helpdata=helpdata.replace("</BASIC>", "");
+
+        helpdata=helpdata.replace("<DELETE>", "");
+        helpdata=helpdata.replace("</DELETE>", "");
+        System.out.println(helpdata);
+    }
+    /**
+     * @author viborole
+     * @throws IOException 
+     */
+    private static StringBuffer getHelpData() {
+        StringBuffer help = new StringBuffer();
+        InputStream is=null;
+        InputStreamReader r=null;
+        BufferedReader br=null;
+        try{
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            is = classLoader.getResourceAsStream("Help.txt");
+            r = new InputStreamReader(is);
+            br = new BufferedReader(r);
+            String line;
+            while ((line = br.readLine())!= null){
+                if(!line.isEmpty()){
+                    help.append(line).append("\n");
+                }
+            }
+        }catch(Exception e){
+            
+        }finally{
+            try{
+                if(is!=null) is.close();
+                if(r!=null) r.close();
+                if(br!=null) br.close();
+            }catch(Exception e){e.printStackTrace();}
+        }
+        return help;
     }
     
-    private static void printHelp(){
-        System.out.println("print help");
-        System.out.println("print config");
-        System.out.println("print tenant-list");
-        System.out.println("print tenant-info");
+    private static void printHelp() throws Exception{
+        StringBuffer help = getHelpData();
+        String data=help.substring(help.indexOf("<PRINT>"), help.indexOf("</PRINT>"));
+        System.out.println(data.replace("<PRINT>", ""));
     }
     
     private static void deleteHelp(){
-        System.out.println("delete tenant-all-instances");
-        System.out.println("delete tenant-all-volumes");
-        System.out.println("delete tenant-all-volume-snapshots");
-        System.out.println("delete tenant-all-images");
-        System.out.println("delete tenant-all-networks");
-        System.out.println("delete tenant-all-routers");
-        System.out.println("delete tenant-all-security-group-rules");
-        System.out.println("delete tenant-info");
+        StringBuffer help = getHelpData();
+        String data=help.substring(help.indexOf("<DELETE>"), help.indexOf("</DELETE>"));
+        System.out.println(data.replace("<DELETE>", ""));
     }
     
     private static void glanceHelp(){
-        System.out.println("glance help");
-        System.out.println("glance image-list");
-        System.out.println("glance image-create <imagePath> <name>");
-        System.out.println("glance image-download <imageId> <downloadlocation> <name>");
+        StringBuffer help = getHelpData();
+        String data=help.substring(help.indexOf("<GLANCE>"), help.indexOf("</GLANCE>"));
+        System.out.println(data.replace("<GLANCE>", ""));
         
     }
     
     private static void novaHelp(){
-        System.out.println("nova help");
-        System.out.println("nova start <serverId>");
-        System.out.println("nova stop <serverId>");
-        System.out.println("nova restart <serverId>");
-        System.out.println("nova download <serverId> <downloadlocation> <name>");
-        System.out.println("nova flavor-list");
-        System.out.println("nova boot <imageId> <flavorId> <netId> <name>");
-        System.out.println("nova boot-volume <volumeId> <flavorId> <netId> <name>");
-        System.out.println("nova delete <serverId>");
-        System.out.println("nova status <serverId>");
-        System.out.println("nova snapshot <serverId> <name>");
+        StringBuffer help = getHelpData();
+        String data=help.substring(help.indexOf("<NOVA>"), help.indexOf("</NOVA>"));
+        System.out.println(data.replace("<NOVA>", ""));
     }
     private static void cinderHelp() {
-        System.out.println("cinder help");
-        System.out.println("cinder create <size-in-gb> <name>");
-        System.out.println("cinder create-from-image <imageId> <size-in-gb> <name>");
-        System.out.println("cinder create-from-volume-snapshot <snapshotId> <size-in-gb> <name>");
-        System.out.println("cinder list");
-        System.out.println("cinder show <volumeId>");
-        System.out.println("cinder volume-attach <serverId> <volumeId>");
-        System.out.println("cinder volume-dettach <serverId> <volumeId>");
-        System.out.println("cinder delete <volumeId>");
-        System.out.println("cinder upload-to-image <volumeId> <name>");
+        StringBuffer help = getHelpData();
+        String data=help.substring(help.indexOf("<CINDER>"), help.indexOf("</CINDER>"));
+        System.out.println(data.replace("<CINDER>", ""));
         
     }    
     private static void neutronHelp() {
-        System.out.println("neutron help");
-        System.out.println("neutron net-list");
+        StringBuffer help = getHelpData();
+        String data=help.substring(help.indexOf("<NEUTRON>"), help.indexOf("</NEUTRON>"));
+        System.out.println(data.replace("<NEUTRON>", ""));
     }    
     private static void configFormat(){
         System.out.println("CONFIG FILE FORMAT");
