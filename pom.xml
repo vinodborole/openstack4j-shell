@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.openstack4j.app</groupId>
   <artifactId>openstack4j-shell</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>openstack4j-shell</name>
   <description>openstack4j-shell</description>
   <dependencies>
