@@ -28,14 +28,14 @@ public class TenantAPI {
         System.out.println("================================================================================");
         System.out.println("----------------------------VOLUME DETAILS---------------------------------------");
         System.out.println("================================================================================");
-                     CinderAPI.printVolumeDetails(CinderAPI.listvolumes());
-                     System.out.println("");
-                     System.out.println("");
-                     System.out.println("================================================================================");
-                     System.out.println("----------------------------VOLUME SNAPSHOT DETAILS-------------------------------");
-                     System.out.println("================================================================================");
-                     System.out.println("");
-                     System.out.println("");
+        CinderAPI.printVolumeDetails(CinderAPI.listvolumes());
+        System.out.println("");
+        System.out.println("");
+        System.out.println("================================================================================");
+        System.out.println("----------------------------VOLUME SNAPSHOT DETAILS-------------------------------");
+        System.out.println("================================================================================");
+        System.out.println("");
+        System.out.println("");
         CinderAPI.printVolumeSnapDetails(CinderAPI.getAllVolumeSnapshots());
         System.out.println("");
         System.out.println("");
@@ -62,6 +62,7 @@ public class TenantAPI {
         System.out.println("================================================================================");
         NeutronAPI.printSecurityGroup(NeutronAPI.getAllSecurityGroups());
         List<? extends SecurityGroup> secGroups = NeutronAPI.getAllSecurityGroups();
+        
         for(SecurityGroup secGrp : secGroups){
             System.out.println("");
             System.out.println("");
