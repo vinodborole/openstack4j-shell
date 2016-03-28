@@ -1,6 +1,10 @@
 # openstack4j-shell
 Ability to execute openstack4j api's through shell
 
+## Download:
+
+Download [openstack4j-shell] (http://www.vinodborole.com/projects/openstack4j-shell/openstack4j-shell.jar)
+
 ## Build:
 
 In order to build this project use following maven goal
