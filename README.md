@@ -1,9 +1,17 @@
-# openstack4j-shell
+Openstack4j-shell
+=================
+
+[![Build Status](https://travis-ci.org/vinodborole/openstack4j-shell.svg?branch=master)](https://travis-ci.org/vinodborole/openstack4j-shell) 
+
 Ability to execute openstack4j api's through shell
 
 ## Download:
 
 Download [openstack4j-shell] (http://www.vinodborole.com/projects/openstack4j-shell/openstack4j-shell.jar)
+
+## Bug Reports:
+
+* GitHub Issues: [Click Here](https://github.com/vinodborole/openstack4j-shell/issues)
 
 ## Build:
 
