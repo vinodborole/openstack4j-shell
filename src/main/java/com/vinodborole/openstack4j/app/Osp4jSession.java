@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.openstack4j.api.OSClient;
-import org.openstack4j.core.transport.Config;
 import org.openstack4j.model.common.Identifier;
 import org.openstack4j.openstack.OSFactory;
 
