@@ -84,6 +84,18 @@ public class Osp4jShellNovaCommands implements IOsp4jShellCommands{
                    
                 }
                 break;
+                case BOOT_DEFAULT:
+                { 
+                    String serverId=NovaAPI.bootdefault(params.get(2),params.get(3));
+                    NovaAPI.printServerDetails(NovaAPI.getServer(serverId));
+                }
+                break;
+                case BOOT_VOLUME_DEFAULT:
+                {
+                    String serverId=NovaAPI.bootvolumedefault(params.get(2),params.get(3));
+                    NovaAPI.printServerDetails(NovaAPI.getServer(serverId));
+                }
+                break;
                 case DELETE:
                 {
                     NovaAPI.delete(params.get(2));
@@ -98,6 +110,16 @@ public class Osp4jShellNovaCommands implements IOsp4jShellCommands{
                 {
                     String imageId=NovaAPI.createSnapshot(params.get(2), params.get(3));
                     GlanceAPI.printImageDetails(GlanceAPI.getImageDetail(imageId));
+                }
+                break;
+                case LIST:
+                {
+                    NovaAPI.printServersDetails(NovaAPI.listServers());
+                }
+                break;
+                case SHOW:
+                {
+                    NovaAPI.printServerDetails(NovaAPI.getServer(params.get(2)));
                 }
                 break;
                 case HELP:

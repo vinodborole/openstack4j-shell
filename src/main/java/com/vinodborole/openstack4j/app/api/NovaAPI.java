@@ -18,11 +18,12 @@ import org.openstack4j.model.compute.Server.Status;
 import org.openstack4j.model.compute.ServerCreate;
 import org.openstack4j.model.compute.builder.BlockDeviceMappingBuilder;
 import org.openstack4j.model.compute.builder.ServerCreateBuilder;
-import org.openstack4j.model.storage.block.VolumeSnapshot;
+import org.openstack4j.model.network.Network;
 
 import com.vinodborole.openstack4j.app.Osp4jSession;
 import com.vinodborole.openstack4j.app.api.CinderAPI.CinderKey;
 import com.vinodborole.openstack4j.app.api.GlanceAPI.GlanceKey;
+import com.vinodborole.openstack4j.app.api.NeutronAPI.NeutronKey;
 import com.vinodborole.openstack4j.app.utils.TableBuilder;
 
 public class NovaAPI {
@@ -98,15 +99,17 @@ public class NovaAPI {
         }
     }
     
-    public static void listflavor(){
+    public static List<? extends Flavor> listflavor(){
         OSClient os=Osp4jSession.getOspSession();
         FlavorService flavorService = os.compute().flavors();
         List<? extends Flavor> flavorList = flavorService.list();
         printFlavorsDetails(flavorList);
+        return flavorList;
     }
     public static String boot(String imageOrVolumeId, String flavorId, String netId, String name, boolean bootfromVolume) {
         OSClient os=Osp4jSession.getOspSession();
         List<String> netList = new ArrayList<String>();
+        netId=CommonAPI.takeFromMemory(NeutronKey.NEUTRON_NETWORKID, netId);
         netList.add(netId);
         ServerCreateBuilder builder = null; 
         Map<String,String> metadata = new HashMap<String,String>();
@@ -128,6 +131,31 @@ public class NovaAPI {
         waitUntilServerActive(os,server.getId()); 
         printServerDetails(os.compute().servers().get(server.getId()));
         return server.getId();
+    }
+    public static String bootdefault(String imageId, String name) throws Exception {
+        imageId=CommonAPI.takeFromMemory(GlanceKey.IMAGE_ID, imageId);
+        Flavor flavor=getFlavor(50, 2048, 1);
+        Network network=NeutronAPI.createNetDefault(name);
+        String serverId = boot(imageId, flavor.getId(),network.getId(),name,false);
+        return serverId;
+    }
+    public static String bootvolumedefault(String volumeId, String name) throws Exception {
+        volumeId=CommonAPI.takeFromMemory(CinderKey.VOLUME_ID, volumeId);
+        Flavor flavor=getFlavor(50, 2048, 1);
+        Network network=NeutronAPI.createNetDefault(name);
+        String serverId = boot(volumeId, flavor.getId(),network.getId(),name,true);
+        return serverId;
+    }
+    public static Flavor getFlavor(int edisk, int eram , int evcpu){
+        List<? extends Flavor> flavors=listflavor();
+        for(Flavor flavor : flavors){
+            int disk=flavor.getDisk();
+            int ram=flavor.getRam();
+            int vcpu=flavor.getVcpus();
+            if(disk==edisk && ram == eram && evcpu==vcpu)
+                return flavor;
+        }
+        return null;
     }
     private static void waitUntilServerActive(OSClient os,String serverId) {
         while(true){
@@ -249,6 +277,8 @@ public class NovaAPI {
             addresses=addressesobj.toString();
         tb.addRow(server.getId(),server.getName(),imageName,server.getFlavor().getName(),server.getStatus().toString(),server.getPowerState(),server.getAccessIPv4(),server.getAccessIPv6(),addresses,metadata);
     }
+
+
     
     
 }

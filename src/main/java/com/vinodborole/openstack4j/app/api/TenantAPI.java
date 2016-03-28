@@ -7,12 +7,11 @@ import java.util.TimerTask;
 
 import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.image.Image;
+import org.openstack4j.model.network.Network;
 import org.openstack4j.model.network.Router;
 import org.openstack4j.model.network.SecurityGroup;
 import org.openstack4j.model.network.SecurityGroupRule;
 import org.openstack4j.model.storage.block.VolumeSnapshot;
-
-import com.vinodborole.openstack4j.app.model.NetworkModel;
 
 public class TenantAPI {
     /**
@@ -123,10 +122,10 @@ public class TenantAPI {
      * @author viborole
      */
     public static void deleteAllNetworks() throws Exception {
-        List<NetworkModel> netList=NeutronAPI.netList();
+        List<Network> netList=NeutronAPI.netList();
         System.out.println("Total number of Networks found "+netList.size());
         System.out.println("Deleting Networks..");
-        for(NetworkModel netModel :netList){
+        for(Network netModel :netList){
             NeutronAPI.delete(netModel.getId());
         }
     }

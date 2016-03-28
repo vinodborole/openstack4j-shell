@@ -31,11 +31,11 @@ public class CommonAPI {
         IShellMemory<T> novaMemory=ShellContext.getContext().getShellMemory();
         novaMemory.removeFromMemory(key);
     }
-    public static <T> String takeFromMemory(T key , String serverId) {
-        if(serverId.equalsIgnoreCase("$")){
+    public static <T> String takeFromMemory(T key , String Id) {
+        if(Id.equalsIgnoreCase("$")){
             return ShellContext.getContext().getShellMemory().getFromMemory(key);
         }else{
-            return serverId;
+            return Id;
         }
     }
 

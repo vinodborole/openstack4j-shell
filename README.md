@@ -104,12 +104,29 @@ nova boot-volume <volumeId> <flavorId> <netId> <name>
 nova delete <serverId>
 nova status <serverId>
 nova snapshot <serverId> <name>
+nova boot-default <imageId> <name>
+nova boot-volume-default <volumeId> <name>
+nova list
+nova show <serverId>
 ```
 
 ###### Neutron Commands
 ```
 neutron help
 neutron net-list
+neutron help
+neutron net-list
+neutron net-show <netId>
+neutron net-create <name>
+neutron net-delete <netId>
+neutron router-create <name>
+neutron router-delete <routerId>
+neutron router-list
+neutron router-show <routerId>
+neutron router-interface-add <routerId> <subnetId>
+neutron router-interface-delete <routerId> <subnetId>
+neutron net-create-default <name>
+
 ```
 ###### Cinder Commands
 ```

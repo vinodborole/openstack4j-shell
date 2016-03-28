@@ -4,17 +4,10 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import org.openstack4j.api.OSClient;
-import org.openstack4j.model.compute.ActionResponse;
 import org.openstack4j.model.identity.Tenant;
-import org.openstack4j.model.image.Image;
 
 import com.vinodborole.openstack4j.app.Osp4jSession;
 import com.vinodborole.openstack4j.app.ShellContext;
-import com.vinodborole.openstack4j.app.api.CinderAPI;
-import com.vinodborole.openstack4j.app.api.CommonAPI;
-import com.vinodborole.openstack4j.app.api.GlanceAPI;
-import com.vinodborole.openstack4j.app.api.NeutronAPI;
-import com.vinodborole.openstack4j.app.api.NovaAPI;
 import com.vinodborole.openstack4j.app.api.TenantAPI;
 import com.vinodborole.openstack4j.app.commands.factory.IOsp4jShellCommands;
 import com.vinodborole.openstack4j.app.utils.Osp4jShellCommmandHelpInfo;
