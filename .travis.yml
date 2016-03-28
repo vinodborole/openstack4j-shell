@@ -1,0 +1,18 @@
+language: java
+
+jdk:
+  - oraclejdk7
+  - openjdk7
+
+notifications:
+  email: false
+  
+# whitelist
+branches:
+  only:
+    - master
+    
+sudo: false 
+
+script: 
+  mvn clean compile assembly:single
