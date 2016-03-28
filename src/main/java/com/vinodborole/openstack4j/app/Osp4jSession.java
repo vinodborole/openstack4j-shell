@@ -1,7 +1,7 @@
 /**
  * @author viborole
  */
-package com.openstack4j.app;
+package com.vinodborole.openstack4j.app;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.openstack4j.api.OSClient;
-import org.openstack4j.core.transport.Config;
 import org.openstack4j.model.common.Identifier;
 import org.openstack4j.openstack.OSFactory;
 

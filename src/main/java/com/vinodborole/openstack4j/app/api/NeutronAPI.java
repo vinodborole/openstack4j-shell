@@ -1,4 +1,4 @@
-package com.openstack4j.app.api;
+package com.vinodborole.openstack4j.app.api;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +16,9 @@ import org.openstack4j.model.network.Subnet;
 import org.openstack4j.model.network.options.PortListOptions;
 
 import com.google.common.base.Strings;
-import com.openstack4j.app.Osp4jSession;
-import com.openstack4j.app.model.NetworkModel;
-import com.openstack4j.app.utils.TableBuilder;
+import com.vinodborole.openstack4j.app.Osp4jSession;
+import com.vinodborole.openstack4j.app.model.NetworkModel;
+import com.vinodborole.openstack4j.app.utils.TableBuilder;
 
 public class NeutronAPI {
     protected enum NeutronKey{

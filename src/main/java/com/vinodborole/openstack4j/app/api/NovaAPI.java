@@ -1,4 +1,4 @@
-package com.openstack4j.app.api;
+package com.vinodborole.openstack4j.app.api;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,10 +20,10 @@ import org.openstack4j.model.compute.builder.BlockDeviceMappingBuilder;
 import org.openstack4j.model.compute.builder.ServerCreateBuilder;
 import org.openstack4j.model.storage.block.VolumeSnapshot;
 
-import com.openstack4j.app.Osp4jSession;
-import com.openstack4j.app.api.CinderAPI.CinderKey;
-import com.openstack4j.app.api.GlanceAPI.GlanceKey;
-import com.openstack4j.app.utils.TableBuilder;
+import com.vinodborole.openstack4j.app.Osp4jSession;
+import com.vinodborole.openstack4j.app.api.CinderAPI.CinderKey;
+import com.vinodborole.openstack4j.app.api.GlanceAPI.GlanceKey;
+import com.vinodborole.openstack4j.app.utils.TableBuilder;
 
 public class NovaAPI {
 

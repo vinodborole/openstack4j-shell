@@ -1,4 +1,4 @@
-package com.openstack4j.app.utils;
+package com.vinodborole.openstack4j.app.utils;
 
 public class OspPrintWriter {
     

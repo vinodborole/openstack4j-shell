@@ -1,10 +1,11 @@
 /**
  * @author viborole
  */
-package com.openstack4j.app.api;
+package com.vinodborole.openstack4j.app.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
@@ -16,8 +17,8 @@ import org.openstack4j.model.image.ContainerFormat;
 import org.openstack4j.model.image.DiskFormat;
 import org.openstack4j.model.image.Image;
 
-import com.openstack4j.app.Osp4jSession;
-import com.openstack4j.app.utils.TableBuilder;
+import com.vinodborole.openstack4j.app.Osp4jSession;
+import com.vinodborole.openstack4j.app.utils.TableBuilder;
 
 
 public class GlanceAPI { 
@@ -108,8 +109,14 @@ public class GlanceAPI {
         return tb;
      }
     private static void addImageRow(TableBuilder tb,Image image){
-        tb.addRow(image.getId(),image.getName(),image.getStatus().toString(),image.getSize().toString(),image.getContainerFormat().toString(),String.valueOf(image.isPublic()));
+        tb.addRow(image.getId(),image.getName(),image.getStatus().toString(),readableFileSize(image.getSize()),image.getContainerFormat().toString(),String.valueOf(image.isPublic()));
     }
 
+    public static String readableFileSize(long size) {
+        if(size <= 0) return "0";
+        final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
+        int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+    }
   
 }
