@@ -1,10 +1,18 @@
 package com.vinodborole.openstack4j.app.commands;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openstack4j.model.compute.ActionResponse;
+import org.openstack4j.model.compute.Flavor;
+import org.openstack4j.model.network.Network;
+import org.openstack4j.model.network.Router;
+import org.openstack4j.model.network.RouterInterface;
+import org.openstack4j.model.network.Subnet;
 
 import com.vinodborole.openstack4j.app.api.GlanceAPI;
+import com.vinodborole.openstack4j.app.api.NeutronAPI;
 import com.vinodborole.openstack4j.app.api.NovaAPI;
 import com.vinodborole.openstack4j.app.commands.factory.IOsp4jShellCommands;
 import com.vinodborole.openstack4j.app.utils.Osp4jShellCommmandHelpInfo;
@@ -94,6 +102,34 @@ public class Osp4jShellNovaCommands implements IOsp4jShellCommands{
                 {
                     String serverId=NovaAPI.bootvolumedefault(params.get(2),params.get(3));
                     NovaAPI.printServerDetails(NovaAPI.getServer(serverId));
+                }
+                break;
+                case BOOT_CUSTOM:
+                {
+                	Map<String, String> ids = new HashMap<String,String>();
+                	try{
+                		Flavor flavor=NovaAPI.getFlavor(Integer.parseInt(params.get(3)), Integer.parseInt(params.get(4)), Integer.parseInt(params.get(5)));
+                		ids=NeutronAPI.createNetworking(params.get(6),params.get(7));
+                		String serverId=NovaAPI.boot(params.get(2), flavor.getId(), ids.get("network"), params.get(7), false);
+                		ids.put("server", serverId);
+                		NovaAPI.printServerDetails(NovaAPI.getServer(serverId));
+                	}catch(Exception e){
+                		NeutronAPI.deleteNetworking(ids);
+                	}
+                }
+                break;
+                case BOOT_VOLUME_CUSTOM:
+                {
+                	Map<String, String> ids = new HashMap<String,String>();
+                	try{
+                		Flavor flavor=NovaAPI.getFlavor(50, 2048, 1);
+                		ids=NeutronAPI.createNetworking(params.get(3),params.get(4));
+                		String serverId=NovaAPI.boot(params.get(2), flavor.getId(), ids.get("network"), params.get(4), true);
+                		ids.put("server", serverId);
+                		NovaAPI.printServerDetails(NovaAPI.getServer(serverId));
+                	}catch(Exception e){
+                		NeutronAPI.deleteNetworking(ids);
+                	}
                 }
                 break;
                 case DELETE:

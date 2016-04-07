@@ -8,13 +8,16 @@ nova download <serverId> <downloadlocation> <name>
 nova flavor-list
 nova boot <imageId> <flavorId> <netId> <name>
 nova boot-volume <volumeId> <flavorId> <netId> <name>
+nova boot-default <imageId> <name>
+nova boot-volume-default <volumeId> <name>
+nova boot-custom <imageId> <disk> <ram> <cpu> <cidr> <name>
+nova boot-volume-custom <volumeId> <cidr> <name>
 nova delete <serverId>
 nova status <serverId>
 nova snapshot <serverId> <name>
-nova boot-default <imageId> <name>
-nova boot-volume-default <volumeId> <name>
 nova list
 nova show <serverId>
+
 </NOVA>
 
 <CINDER>

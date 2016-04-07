@@ -32,19 +32,19 @@ public class NovaAPI {
         NOVA_SERVERID;
     }
    
-    public static ActionResponse startVM(String serverId){
+    public static ActionResponse startVM(String serverId) throws Exception{
         OSClient os=Osp4jSession.getOspSession();
         serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
         return os.compute().servers().action(serverId, Action.START);
     }
 
-    public static boolean stopVM(String serverId){
+    public static boolean stopVM(String serverId) throws Exception{
         OSClient os=Osp4jSession.getOspSession();
         serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
         os.compute().servers().action(serverId, Action.STOP);
         return waitUntilServerSHUTOFF(os,serverId);
     }
-    public static ActionResponse restartVM(String serverId){
+    public static ActionResponse restartVM(String serverId) throws Exception{
         serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
         stopVM(serverId);
         return startVM(serverId);
@@ -57,12 +57,12 @@ public class NovaAPI {
         return response;
     }
     
-    public static Server getServer(String serverId) {
+    public static Server getServer(String serverId) throws Exception {
         OSClient os=Osp4jSession.getOspSession();
         return os.compute().servers().get(serverId);
     }
 
-    public static List<? extends Server> listServers(){
+    public static List<? extends Server> listServers() throws Exception{
         OSClient os=Osp4jSession.getOspSession();
         List<? extends Server> servers=os.compute().servers().list();
         return servers;
@@ -83,7 +83,7 @@ public class NovaAPI {
         
         return imageId;
     }
-    private static void waitUntilImageACTIVE(OSClient os,String imageId) {
+    private static void waitUntilImageACTIVE(OSClient os,String imageId) throws Exception {
         System.out.println("wait until image is ACTIVE..");
         while(true){
             org.openstack4j.model.image.Image.Status status =  os.images().get(imageId).getStatus();
@@ -99,14 +99,14 @@ public class NovaAPI {
         }
     }
     
-    public static List<? extends Flavor> listflavor(){
+    public static List<? extends Flavor> listflavor() throws Exception{
         OSClient os=Osp4jSession.getOspSession();
         FlavorService flavorService = os.compute().flavors();
         List<? extends Flavor> flavorList = flavorService.list();
         printFlavorsDetails(flavorList);
         return flavorList;
     }
-    public static String boot(String imageOrVolumeId, String flavorId, String netId, String name, boolean bootfromVolume) {
+    public static String boot(String imageOrVolumeId, String flavorId, String netId, String name, boolean bootfromVolume) throws Exception {
         OSClient os=Osp4jSession.getOspSession();
         List<String> netList = new ArrayList<String>();
         netId=CommonAPI.takeFromMemory(NeutronKey.NEUTRON_NETWORKID, netId);
@@ -146,7 +146,7 @@ public class NovaAPI {
         String serverId = boot(volumeId, flavor.getId(),network.getId(),name,true);
         return serverId;
     }
-    public static Flavor getFlavor(int edisk, int eram , int evcpu){
+    public static Flavor getFlavor(int edisk, int eram , int evcpu) throws Exception{
         List<? extends Flavor> flavors=listflavor();
         for(Flavor flavor : flavors){
             int disk=flavor.getDisk();
@@ -157,7 +157,7 @@ public class NovaAPI {
         }
         return null;
     }
-    private static void waitUntilServerActive(OSClient os,String serverId) {
+    private static void waitUntilServerActive(OSClient os,String serverId) throws Exception {
         while(true){
             Status status =  os.compute().servers().get(serverId).getStatus();
             System.out.println("current status: "+status.toString());
@@ -171,7 +171,7 @@ public class NovaAPI {
             }
         }
     }
-    private static void waitUntilServerDeleted(OSClient os, String serverId){
+    private static void waitUntilServerDeleted(OSClient os, String serverId) throws Exception{
         while(true){
             Server server=os.compute().servers().get(serverId);
             Server.Status status=Status.DELETED;
@@ -188,7 +188,7 @@ public class NovaAPI {
             }
         }
     }
-    private static boolean waitUntilServerSHUTOFF(OSClient os,String serverId) {
+    private static boolean waitUntilServerSHUTOFF(OSClient os,String serverId) throws Exception {
         while(true){
             Status status =  os.compute().servers().get(serverId).getStatus();
             System.out.println("current status: "+status.toString());
@@ -203,13 +203,13 @@ public class NovaAPI {
         }
         return true;
     }
-    public static void delete(String serverId) {
+    public static void delete(String serverId) throws Exception {
         OSClient os=Osp4jSession.getOspSession();
         serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
         os.compute().servers().delete(serverId);
         waitUntilServerDeleted(os,serverId);
     }
-    public static void status(String serverId) {
+    public static void status(String serverId) throws Exception {
         OSClient os=Osp4jSession.getOspSession();
         serverId=CommonAPI.takeFromMemory(NovaKey.NOVA_SERVERID,serverId);
         Server server=os.compute().servers().get(serverId);

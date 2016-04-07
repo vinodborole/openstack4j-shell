@@ -50,6 +50,8 @@ public enum Commands {
     VOLUME_DETTACH("volume-dettach"), 
     BOOT_VOLUME("boot-volume"), 
     BOOT_VOLUME_DEFAULT("boot-volume-default"),
+    BOOT_CUSTOM("boot-custom"),
+    BOOT_VOLUME_CUSTOM("boot-volume-custom"),
     SNAPSHOT("snapshot"), 
     UPLOAD_TO_IMAGE("upload-to-image"), 
     TENANT_ALL_INSTANCES("tenant-all-instances"), 

@@ -70,17 +70,17 @@ public class GlanceAPI {
         return false;
     }
     
-    public static Image getImageDetail(String imageId){
+    public static Image getImageDetail(String imageId) throws Exception{
         imageId=CommonAPI.takeFromMemory(GlanceKey.IMAGE_ID,imageId);
         OSClient os=Osp4jSession.getOspSession();
         return os.images().get(imageId);
     }
      
-    public static void delete(String id) {
+    public static void delete(String id) throws Exception {
         OSClient os=Osp4jSession.getOspSession();
         os.images().delete(id);
     }      
-    public static List<? extends Image> imageList(){
+    public static List<? extends Image> imageList() throws Exception{
         OSClient os=Osp4jSession.getOspSession();
         final List<? extends Image> images = os.images().list();
         return images;

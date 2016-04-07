@@ -2,9 +2,12 @@ package com.vinodborole.openstack4j.app.api;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.net.util.SubnetUtils;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.model.compute.FloatingIP;
@@ -31,7 +34,7 @@ public class NeutronAPI {
         NEUTRON_SUBNETID,
         NEUTRON_SUB_INTERFACEID;
     }
-    public static void listfloatingIps() {
+    public static void listfloatingIps() throws Exception {
         OSClient os=Osp4jSession.getOspSession();
         final List<? extends FloatingIP> ips = os.compute().floatingIps().list();
         printFloatingIpDetails(ips);
@@ -49,10 +52,52 @@ public class NeutronAPI {
                             cidr.add(subnet.getCidr());
                     }
                 }
-                networkLst.add(network);
+                networkLst.add(network); 
             }
             
             return networkLst; 
+    }
+    
+    public static Map<String,String> createNetworking(String cidr, String name) throws Exception{
+    	Map<String, String> ids = new HashMap<String,String>();
+    	
+    	Network network=NeutronAPI.createNetwork(name);
+		ids.put("network", network.getId());
+		
+		List<? extends Router> routers=NeutronAPI.getAllRouters();
+		
+		Router router=null;
+		if(routers!=null && !routers.isEmpty()){
+			router = routers.get(0);
+			ids.put("router", router.getId());
+		}else{
+			router = NeutronAPI.createRouter(name);
+			ids.put("newrouter", router.getId());
+		}
+		
+		Subnet subnet=NeutronAPI.createSubnet(network.getId(), name, cidr);
+		ids.put("subnet", subnet.getId());
+		
+		RouterInterface routerInterface=NeutronAPI.addSubnetInterfaceToRouter(router.getId(), subnet.getId());
+		ids.put("routerInterface", routerInterface.getId());
+    	
+    	return ids;
+    }
+    
+    public static void deleteNetworking(Map<String, String> ids) throws Exception{
+    	if(!ids.isEmpty()) {
+			if(ids.containsKey("routerInterface")){
+				String routerId = ids.containsKey("router")?ids.get("router"):ids.get("newrouter");
+				NeutronAPI.deleteSubnetInterfaces(routerId, ids.get("subnet"));
+			}
+    		if(ids.containsKey("subnet")){
+    			NeutronAPI.deleteSubnet(ids.get("subnet"));
+    		}
+    		NeutronAPI.delete(ids.get("network"));
+    		if(ids.containsKey("newrouter")){
+    			NeutronAPI.deleteRouter(ids.get("newrouter"));
+    		}
+		}
     }
     
     public static Network createNetDefault(String name) throws Exception{
@@ -71,14 +116,22 @@ public class NeutronAPI {
     }
 
     public static Subnet createSubnet(String networkId, String subnetName, String cidrBlock) throws Exception {
-        networkId=CommonAPI.takeFromMemory(NeutronKey.NEUTRON_NETWORKID, networkId);
-        Subnet subnet = Builders.subnet().name(subnetName + "_shellSubnet_"+new Date()).networkId(networkId).ipVersion(IPVersionType.V4).cidr(cidrBlock).enableDHCP(true).build();
-        subnet = Osp4jSession.getOspSession().networking().subnet().create(subnet);
-        CommonAPI.addToMemory(NeutronKey.NEUTRON_SUBNETID, subnet.getId());
-        return subnet != null ? subnet : null;
+    	if(isValidCidr(cidrBlock)){
+	        networkId=CommonAPI.takeFromMemory(NeutronKey.NEUTRON_NETWORKID, networkId);
+	        Subnet subnet = Builders.subnet().name(subnetName + "_shellSubnet_"+new Date()).networkId(networkId).ipVersion(IPVersionType.V4).cidr(cidrBlock).enableDHCP(true).build();
+	        subnet = Osp4jSession.getOspSession().networking().subnet().create(subnet);
+	        CommonAPI.addToMemory(NeutronKey.NEUTRON_SUBNETID, subnet.getId());
+	        return subnet != null ? subnet : null;
+    	}else{
+    		throw new Exception("Invalid CIDR block");
+    	}
     }
 
-    public static Router createRouter(String routerName) throws Exception {
+    public static boolean isValidCidr(String cidrBlock) throws Exception {
+    	try{SubnetUtils utils = new SubnetUtils(cidrBlock); return true;}catch(Exception e){}
+		return false;
+	}
+	public static Router createRouter(String routerName) throws Exception {
         // if exists router with external connectivity
         List<? extends Router> routers = getAllRouters();
         if (routers != null && !routers.isEmpty()) {
@@ -136,25 +189,25 @@ public class NeutronAPI {
         Osp4jSession.getOspSession().networking().subnet().delete(subnetId);
     }
 
-    public static void deleteRouter(String routerId){
+    public static void deleteRouter(String routerId) throws Exception{
         routerId=CommonAPI.takeFromMemory(NeutronKey.NEUTRON_ROUTERID, routerId);
         Osp4jSession.getOspSession().networking().router().delete(routerId);
     }
 
-    private static Network getNetwork(String networkId) {
+    private static Network getNetwork(String networkId) throws Exception {
         networkId=CommonAPI.takeFromMemory(NeutronKey.NEUTRON_NETWORKID, networkId);
         return Osp4jSession.getOspSession().networking().network().get(networkId);
     }
 
-    private static List<? extends Network> getAllNetwork(){
+    private static List<? extends Network> getAllNetwork() throws Exception{
         return Osp4jSession.getOspSession().networking().network().list();
     }
-    private static Subnet getSubnet(String subnetId) {
+    private static Subnet getSubnet(String subnetId) throws Exception {
         subnetId=CommonAPI.takeFromMemory(NeutronKey.NEUTRON_SUBNETID, subnetId);
         return Osp4jSession.getOspSession().networking().subnet().get(subnetId);
     }
 
-    private static Router getRouter(String routerId) {
+    private static Router getRouter(String routerId) throws Exception {
         routerId=CommonAPI.takeFromMemory(NeutronKey.NEUTRON_ROUTERID, routerId);
         return Osp4jSession.getOspSession().networking().router().get(routerId);
     }
@@ -232,19 +285,19 @@ public class NeutronAPI {
     }
     
     
-    public static List<? extends SecurityGroup> getAllSecurityGroups(){
+    public static List<? extends SecurityGroup> getAllSecurityGroups() throws Exception{
         OSClient os=Osp4jSession.getOspSession();
         return os.networking().securitygroup().list();
     }
-    public static List<? extends SecurityGroupRule> getAllSecurityRules(String secGrpId){
+    public static List<? extends SecurityGroupRule> getAllSecurityRules(String secGrpId) throws Exception{
         OSClient os=Osp4jSession.getOspSession();
         return os.networking().securitygroup().get(secGrpId).getRules();
     }
     
-    public static void deleteSecurityRule(String secRuleId){
+    public static void deleteSecurityRule(String secRuleId) throws Exception{
         Osp4jSession.getOspSession().networking().securityrule().delete(secRuleId);
     }
-    public static void deleteSecurityGroup(String secGrpId){
+    public static void deleteSecurityGroup(String secGrpId) throws Exception{
         Osp4jSession.getOspSession().networking().securitygroup().delete(secGrpId);
     }
     public static void delete(String networkId) throws Exception {
@@ -281,10 +334,10 @@ public class NeutronAPI {
             return false;
         return true;
     }
-    private static List<? extends Subnet> getSubnets(Network network) {
+    private static List<? extends Subnet> getSubnets(Network network) throws Exception {
         return network.getNeutronSubnets();
     }
-    private static String getRouterFromSubnet(String subnetId) {
+    private static String getRouterFromSubnet(String subnetId) throws Exception {
         List<? extends Router> routers = getAllRouters();
         if (routers != null && !routers.isEmpty()) {
             for (Router router : routers) {
@@ -302,24 +355,24 @@ public class NeutronAPI {
         return null;
     }
     
-    public static Network getNetDetails(String networkId) {
+    public static Network getNetDetails(String networkId) throws Exception {
         networkId=CommonAPI.takeFromMemory(NeutronKey.NEUTRON_NETWORKID, networkId);
         return Osp4jSession.getOspSession().networking().network().get(networkId);
     }
     
-    public static List<? extends Router> getAllRouters() {
+    public static List<? extends Router> getAllRouters() throws Exception {
         OSClient os=Osp4jSession.getOspSession();
         List<? extends Router> routers = os.networking().router().list();
         return routers;
     }
     
-    public static Router getRouterDetails(String routerId) {
+    public static Router getRouterDetails(String routerId) throws Exception {
         routerId=CommonAPI.takeFromMemory(NeutronKey.NEUTRON_ROUTERID, routerId);
         OSClient os=Osp4jSession.getOspSession();
         Router router = os.networking().router().get(routerId);
         return router;
     }
-    public static List<? extends Port> getRouterPortList(String routerId) {
+    public static List<? extends Port> getRouterPortList(String routerId) throws Exception {
         routerId=CommonAPI.takeFromMemory(NeutronKey.NEUTRON_ROUTERID, routerId);
         return Osp4jSession.getOspSession().networking().port().list(PortListOptions.create().deviceId(routerId));
     }

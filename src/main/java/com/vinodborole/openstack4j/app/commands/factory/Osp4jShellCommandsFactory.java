@@ -1,7 +1,5 @@
 package com.vinodborole.openstack4j.app.commands.factory;
 
-import com.vinodborole.openstack4j.app.Osp4jSession;
-import com.vinodborole.openstack4j.app.ShellContext;
 import com.vinodborole.openstack4j.app.commands.Commands;
 import com.vinodborole.openstack4j.app.commands.Osp4jShellCinderCommands;
 import com.vinodborole.openstack4j.app.commands.Osp4jShellCommanCommands;
@@ -15,7 +13,7 @@ public class Osp4jShellCommandsFactory {
     private Osp4jShellCommandsFactory(){}
     public static Osp4jShellCommandsFactory getInstance(){
         return INSTANCE;
-    }   
+    }    
     
     public IOsp4jShellCommands getShellCommandExecutor(Commands command){
         

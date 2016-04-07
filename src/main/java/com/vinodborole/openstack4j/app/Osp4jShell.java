@@ -34,20 +34,29 @@ public class Osp4jShell {
              Console console=System.console();
              if(console!=null){
                  while (true) {
-                     executeShell(console);
+                	 try{
+                		 executeShell(console);
+                	 }catch(Exception e){System.out.println("Exception: "+e.getMessage());}
                  }
              }else{
                  System.out.println("No Console associated, Cannot execute the program!");
              }
      }
   }
-    private static void executeShell(Console console) throws Exception{
+
+   private static void executeShell(Console console) throws Exception{
         System.out.print("osp>");
         String commandLine = console.readLine();
+        commandLine=filterCommandLine(commandLine);
         evaluateCommand(commandLine);
     }
     
-    private static void evaluateCommand(String commandLine) throws Exception{
+    private static String filterCommandLine(String commandLine) {
+    	//remove extra spaces
+    	return commandLine.replaceAll("\\s+", " ");
+    }
+
+	private static void evaluateCommand(String commandLine) throws Exception{
         if(commandLine==null){
             System.exit(0);
         }else if (commandLine.equals("") || commandLine.startsWith("#")){

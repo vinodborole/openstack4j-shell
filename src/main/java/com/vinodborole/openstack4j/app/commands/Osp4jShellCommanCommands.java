@@ -23,7 +23,6 @@ public class Osp4jShellCommanCommands implements IOsp4jShellCommands {
     
     @Override
     public void executeCommand(Commands command, List<String> params) throws Exception{
-    try{  
             switch(command!=null?command:command.NULL){
                 case SOURCE:
                 {
@@ -146,10 +145,6 @@ public class Osp4jShellCommanCommands implements IOsp4jShellCommands {
                 default:
                     System.err.println("Invaid command");
             }
-            
-            }catch(Exception e){
-            //suppress exception
-        }
     }
 
 

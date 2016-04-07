@@ -17,7 +17,7 @@ public class TenantAPI {
     /**
      * @author viborole
      */
-    public static void printTenantInfo() {
+    public static void printTenantInfo() throws Exception {
         System.out.println("================================================================================");
         System.out.println("----------------------------SERVER DETAILS---------------------------------------");
         System.out.println("================================================================================");
@@ -74,7 +74,7 @@ public class TenantAPI {
     /**
      * @author viborole
      */
-    public static void deleteAllVMs() {
+    public static void deleteAllVMs() throws Exception {
         List<? extends Server> servers = NovaAPI.listServers();
         System.out.println("Total number of VM's found "+servers.size());
         System.out.println("Deleting Vms..");
@@ -96,7 +96,7 @@ public class TenantAPI {
     /**
      * @author viborole
      */
-    public static void deleteAllVolumeSnapshots() {
+    public static void deleteAllVolumeSnapshots() throws Exception {
         List<? extends VolumeSnapshot> volsnapshotList=CinderAPI.getAllVolumeSnapshots();
         System.out.println("Total number of Volume Snapshots found "+volsnapshotList.size());
         System.out.println("Deleting Volume Snapshots..");
@@ -108,7 +108,7 @@ public class TenantAPI {
     /**
      * @author viborole
      */
-    public static void deleteAllImages() {
+    public static void deleteAllImages() throws Exception {
         List<? extends Image> images = GlanceAPI.imageList();
         System.out.println("Total number of Images found "+images.size());
         System.out.println("Deleting Non-Public Images only..");
@@ -133,7 +133,7 @@ public class TenantAPI {
     /**
      * @author viborole
      */
-    public static void deleteAllRouters() {
+    public static void deleteAllRouters() throws Exception {
         List<? extends Router> routers = NeutronAPI.getAllRouters();
         System.out.println("Total number of Routers found "+routers.size());
         System.out.println("Deleting Routers..");
@@ -145,7 +145,7 @@ public class TenantAPI {
     /**
      * @author viborole
      */
-    public static void deleteAllSecurityGroupRules() {
+    public static void deleteAllSecurityGroupRules() throws Exception {
         System.out.println("This won't delete the default security group.");
         List<? extends SecurityGroup> secGroups = NeutronAPI.getAllSecurityGroups();
         System.out.println("Total number of Security Group found "+secGroups.size());

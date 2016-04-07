@@ -85,7 +85,7 @@ public class CinderAPI {
         return deviceMap;
     }
     
-    public static VolumeSnapshot getVolumeSnapshot( String volumeId){
+    public static VolumeSnapshot getVolumeSnapshot( String volumeId) throws Exception{
         VolumeSnapshot volSnapshot=null;
         volumeId=CommonAPI.takeFromMemory(CinderKey.VOLUME_ID, volumeId);
         BlockVolumeSnapshotService volSnapService = Osp4jSession.getOspSession().blockStorage().snapshots();
@@ -101,12 +101,12 @@ public class CinderAPI {
         return volSnapshot;
     }
     
-    public static void deleteVolumeSnapshot(String volumeSnapshotId){
+    public static void deleteVolumeSnapshot(String volumeSnapshotId) throws Exception{
         BlockVolumeSnapshotService volSnapService = Osp4jSession.getOspSession().blockStorage().snapshots();
         volSnapService.delete(volumeSnapshotId);
     }
     
-    public static List<? extends VolumeSnapshot> getAllVolumeSnapshots(){
+    public static List<? extends VolumeSnapshot> getAllVolumeSnapshots() throws Exception{
         BlockVolumeSnapshotService volSnapService = Osp4jSession.getOspSession().blockStorage().snapshots();
         return volSnapService.list();
     }
@@ -264,13 +264,13 @@ public class CinderAPI {
         }
     }
     
-    public static List<? extends Volume> listvolumes() {
+    public static List<? extends Volume> listvolumes() throws Exception{
         BlockVolumeService volService=Osp4jSession.getOspSession().blockStorage().volumes();
         List<? extends Volume> volList=volService.list();
         return volList;
     }
     
-    public static Set<String> getAllAvailaibleVolumes(){
+    public static Set<String> getAllAvailaibleVolumes() throws Exception{
         Set<String> volSet = new HashSet<String>();
         BlockVolumeService volService=Osp4jSession.getOspSession().blockStorage().volumes();
         List<? extends Volume> volList=volService.list();
@@ -282,7 +282,7 @@ public class CinderAPI {
         return volSet;
     }
     
-    public static void show(String volumeId) {
+    public static void show(String volumeId) throws Exception {
         BlockVolumeService volService=Osp4jSession.getOspSession().blockStorage().volumes();
         volumeId=CommonAPI.takeFromMemory(CinderKey.VOLUME_ID, volumeId);
         Volume volume=volService.get(volumeId);

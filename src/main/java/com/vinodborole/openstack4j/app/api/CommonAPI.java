@@ -19,27 +19,27 @@ import com.vinodborole.openstack4j.app.api.GlanceAPI.GlanceKey;
 
 public class CommonAPI {
       
-    public static <T> void addToMemory(T key, String value){
-        IShellMemory<T> memory=ShellContext.getContext().getShellMemory();
+    public static <T,V> void addToMemory(T key, V value){
+        IShellMemory<T,V> memory=ShellContext.getContext().getShellMemory();
         memory.addToMemory(key, value);
     }
-    public static <T>  String getFromMemory(T key){
-        IShellMemory<T> novaMemory=ShellContext.getContext().getShellMemory();
+    public static <T,V>  V getFromMemory(T key){
+        IShellMemory<T,V> novaMemory=ShellContext.getContext().getShellMemory();
         return novaMemory.getFromMemory(key);
     }
-    public static <T>  void removeFromMemory(T key){
-        IShellMemory<T> novaMemory=ShellContext.getContext().getShellMemory();
+    public static <T,V>  void removeFromMemory(T key){
+        IShellMemory<T,V> novaMemory=ShellContext.getContext().getShellMemory();
         novaMemory.removeFromMemory(key);
     }
-    public static <T> String takeFromMemory(T key , String Id) {
-        if(Id.equalsIgnoreCase("$")){
-            return ShellContext.getContext().getShellMemory().getFromMemory(key);
+    public static <T,V> V takeFromMemory(T key , V Id) {
+        if(Id instanceof String && ((String) Id).equalsIgnoreCase("$")){
+            return (V) ShellContext.getContext().getShellMemory().getFromMemory(key);
         }else{
-            return Id;
+            return Id; 
         }
     }
 
-    public static boolean downloadImage(String imageId, String downloadLocation, String name){
+    public static boolean downloadImage(String imageId, String downloadLocation, String name) throws Exception{
         OSClient os=Osp4jSession.getOspSession();
         ImageService imgService= os.images();
         imageId=takeFromMemory(GlanceKey.IMAGE_ID, imageId);
