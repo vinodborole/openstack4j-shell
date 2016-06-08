@@ -1,6 +1,3 @@
-/**
- * @author viborole
- */
 package com.vinodborole.openstack4j.app.api;
 
 import java.io.File;
@@ -16,7 +13,11 @@ import org.openstack4j.model.image.Image;
 import com.vinodborole.openstack4j.app.Osp4jSession;
 import com.vinodborole.openstack4j.app.ShellContext;
 import com.vinodborole.openstack4j.app.api.GlanceAPI.GlanceKey;
-
+/**
+ * Common API
+ *  
+ * @author vinod borole
+ */
 public class CommonAPI {
       
     public static <T,V> void addToMemory(T key, V value){

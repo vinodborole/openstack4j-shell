@@ -1,12 +1,14 @@
-/**
- * @author viborole
- */
+
 package com.vinodborole.openstack4j.app;
 
 import com.vinodborole.openstack4j.app.api.IShellMemory;
 import com.vinodborole.openstack4j.app.api.ShellMemoryImpl;
 
-
+/**
+ * Shell Context holds the shell memory.
+ * 
+ * @author vinod borole
+ */
 public class ShellContext<T, V> {
 
     private static ShellContext INSTANCE = new ShellContext();

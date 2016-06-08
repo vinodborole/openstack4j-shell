@@ -12,11 +12,12 @@ import org.openstack4j.model.network.Router;
 import org.openstack4j.model.network.SecurityGroup;
 import org.openstack4j.model.network.SecurityGroupRule;
 import org.openstack4j.model.storage.block.VolumeSnapshot;
-
+/**
+ * Tenant API
+ *  
+ * @author vinod borole
+ */
 public class TenantAPI {
-    /**
-     * @author viborole
-     */
     public static void printTenantInfo() throws Exception {
         System.out.println("================================================================================");
         System.out.println("----------------------------SERVER DETAILS---------------------------------------");
@@ -92,7 +93,6 @@ public class TenantAPI {
         System.out.println("Deleting Volumes..");
         CinderAPI.deleteVolumes(volumes);
     }
-
     /**
      * @author viborole
      */
@@ -104,7 +104,6 @@ public class TenantAPI {
             CinderAPI.deleteVolumeSnapshot(volSnap.getId());
         }
     }
-
     /**
      * @author viborole
      */
@@ -117,7 +116,6 @@ public class TenantAPI {
                 GlanceAPI.delete(image.getId());
         }
     }
- 
     /**
      * @author viborole
      */
@@ -129,7 +127,6 @@ public class TenantAPI {
             NeutronAPI.delete(netModel.getId());
         }
     }
-
     /**
      * @author viborole
      */
@@ -141,7 +138,6 @@ public class TenantAPI {
             NeutronAPI.deleteRouter(router.getId());
         }
     }
-
     /**
      * @author viborole
      */
@@ -162,7 +158,6 @@ public class TenantAPI {
             }
         }
     }
-    
     public static void deleteTenantInfo()  throws Exception{
         System.out.println("You are about to delete following information...");
         printTenantInfo();

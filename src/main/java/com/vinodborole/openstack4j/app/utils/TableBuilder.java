@@ -4,7 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
- 
+/**
+ * Command output beautifier.
+ *  
+ * @author vinod borole
+ */ 
 public class TableBuilder {
     private List<String[]> rows = new LinkedList<String[]>();
     

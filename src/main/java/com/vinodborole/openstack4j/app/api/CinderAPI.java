@@ -12,7 +12,7 @@ import org.openstack4j.api.OSClient;
 import org.openstack4j.api.compute.ServerService;
 import org.openstack4j.api.storage.BlockVolumeService;
 import org.openstack4j.api.storage.BlockVolumeSnapshotService;
-import org.openstack4j.model.compute.ActionResponse;
+import org.openstack4j.model.common.ActionResponse;
 import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.image.DiskFormat;
 import org.openstack4j.model.storage.block.Volume;
@@ -25,7 +25,11 @@ import com.vinodborole.openstack4j.app.Osp4jSession;
 import com.vinodborole.openstack4j.app.api.GlanceAPI.GlanceKey;
 import com.vinodborole.openstack4j.app.api.NovaAPI.NovaKey;
 import com.vinodborole.openstack4j.app.utils.TableBuilder;
-
+/**
+ * Cinder API
+ *  
+ * @author vinod borole
+ */
 public class CinderAPI {
 
     protected enum CinderKey{

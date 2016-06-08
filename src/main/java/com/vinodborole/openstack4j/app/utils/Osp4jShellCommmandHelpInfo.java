@@ -4,7 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
+/**
+ * Responsible for printing help info for commands
+ *  
+ * @author vinod borole
+ */
 public class Osp4jShellCommmandHelpInfo {
     public static void allHelp(){
         String helpdata=getHelpData().toString();
@@ -61,26 +65,22 @@ public class Osp4jShellCommmandHelpInfo {
         }
         return help;
     }
-    
     public static void printHelp() throws Exception{
         StringBuffer help = getHelpData();
         String data=help.substring(help.indexOf("<PRINT>"), help.indexOf("</PRINT>"));
         System.out.println(data.replace("<PRINT>", ""));
     }
-    
     public static void deleteHelp(){
         StringBuffer help = getHelpData();
         String data=help.substring(help.indexOf("<DELETE>"), help.indexOf("</DELETE>"));
         System.out.println(data.replace("<DELETE>", ""));
     }
-    
     public static void glanceHelp(){
         StringBuffer help = getHelpData();
         String data=help.substring(help.indexOf("<GLANCE>"), help.indexOf("</GLANCE>"));
         System.out.println(data.replace("<GLANCE>", ""));
         
     }
-    
     public static void novaHelp(){
         StringBuffer help = getHelpData();
         String data=help.substring(help.indexOf("<NOVA>"), help.indexOf("</NOVA>"));
@@ -112,4 +112,8 @@ public class Osp4jShellCommmandHelpInfo {
         System.out.println("OS_ENABLE_SSL=true");
         System.out.println("OS_ENABLE_LOGGING=false");
     }
+
+
+
+
 }

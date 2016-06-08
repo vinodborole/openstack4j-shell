@@ -1,13 +1,14 @@
-/**
- * @author viborole
- */
 package com.vinodborole.openstack4j.app.api;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-
+/**
+ * Shell memory implementation
+ *  
+ * @author vinod borole
+ */
 public class ShellMemoryImpl<T, V> implements IShellMemory<T,V> {
     private Map<T, V> memory= new HashMap<T, V>();   
     
