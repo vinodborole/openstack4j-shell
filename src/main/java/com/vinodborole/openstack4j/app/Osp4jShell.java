@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
@@ -22,6 +23,7 @@ public class Osp4jShell {
         if(args.length>0 && !Strings.isNullOrEmpty(args[0]) && args[0].equalsIgnoreCase("testsuite")){
             externalSource(args);
         }else{
+            printSignature();
             cliSource();
         }
     }
@@ -50,6 +52,16 @@ public class Osp4jShell {
                 commandLine=filterCommandLine(commandLine);
                 evaluateCommand(commandLine);
             }catch(Exception e){System.out.println("Exception: "+e.getMessage()); e.printStackTrace();System.out.println("Type 'help' for command information");}
+        }
+    }
+    private static void printSignature() throws Exception {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        InputStream is = classLoader.getResourceAsStream("signature.txt");
+        InputStreamReader r = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(r);
+        String line = null;
+        while ((line = br.readLine()) != null) {
+          System.out.println(line);
         }
     }
     private static String filterCommandLine(String commandLine) {
