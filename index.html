@@ -45,13 +45,16 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a href="#about">Getting Started</a>
+                        <a target="_blank" href="https://github.com/vinodborole/openstack4j-shell">Getting Started</a>
                     </li>
                     <li>
-                        <a href="#services">Docs</a>
+                        <a target="_blank" href="https://github.com/vinodborole/openstack4j-shell/wiki">Docs</a>
                     </li>
                     <li>
-                        <a href="#contact">Issues</a>
+                        <a target="_blank" href="https://github.com/vinodborole/openstack4j-shell/issues">Issues</a>
+                    </li>
+                    <li style="float: right">
+                        <a target="_blank" href="download/0.1/openstack4j-cli.zip">Download</a>
                     </li>
                 </ul>
             </div>
@@ -64,8 +67,8 @@
     <header class="header-image">
         <div class="headline">
             <div class="container">
-                <h1>Openstack4j CLI</h1>
-                <h2>Fluent Openstack CLI</h2>
+                <h1></h1>
+                <h2></h2>
             </div>
         </div>
     </header>
@@ -77,35 +80,46 @@
 
         <!-- First Featurette -->
         <div class="featurette" id="about">
-            <img class="featurette-image img-circle img-responsive pull-right" src="http://placehold.it/500x500">
-            <h2 class="featurette-heading">This First Heading
-                <span class="text-muted">Will Catch Your Eye</span>
+            <img class="featurette-image  img-responsive pull-right" src="media/no-install.png">
+            <h2 class="featurette-heading">Runs on Java
+                <span class="text-muted">no need of any pre-requists software</span>
             </h2>
-            <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
+            <p class="lead">Openstack4j CLI is completely written in java and consumes the API from openstack4j library, To run, it just needs a JRE 6+. A single executable jar that is portable on any Java or OS platform.</p>
         </div>
 
         <hr class="featurette-divider">
 
         <!-- Second Featurette -->
         <div class="featurette" id="services">
-            <img class="featurette-image img-circle img-responsive pull-left" src="http://placehold.it/500x500">
-            <h2 class="featurette-heading">The Second Heading
-                <span class="text-muted">Is Pretty Cool Too.</span>
+            <img class="featurette-image  img-responsive pull-left" src="media/all-in-one.png">
+            <h2 class="featurette-heading">Single client 
+                <span class="text-muted">for all the openstack services.</span>
             </h2>
-            <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
+            <p class="lead">Openstack4j CLI is all in one, it bundles all the openstack services client into one; mainly glance, nova, neutron, cinder etc.</p>
         </div>
 
         <hr class="featurette-divider">
 
         <!-- Third Featurette -->
         <div class="featurette" id="contact">
-            <img class="featurette-image img-circle img-responsive pull-right" src="http://placehold.it/500x500">
-            <h2 class="featurette-heading">The Third Heading
-                <span class="text-muted">Will Seal the Deal.</span>
+            <img class="featurette-image  img-responsive pull-right" src="media/easy.png">
+            <h2 class="featurette-heading">Fluent CLI's, 
+                <span class="text-muted">easy to use and understand CLI commands to do precisely what is needed</span>
             </h2>
-            <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
+            <p class="lead">Fluent commands that are easy to understand and does takes care of executing any pre-requists commands that is needed with default settings. Easy command options that are do not depend on any long Identifiers. </p>
         </div>
 
+		<hr class="featurette-divider">
+
+        <!-- Fourth Featurette -->
+        <div class="featurette" id="services">
+            <img class="featurette-image img-responsive pull-left" src="media/memory.png">
+            <h2 class="featurette-heading">Inbuilt memory 
+                <span class="text-muted">feature that remembers the output which can be reused in subsequent commands.</span>
+            </h2>
+            <p class="lead">Openstack4j CLI comes with an inbuilt memory feature, that saves all the Id's generated from any command and automatically replaces it subsequent commands if referred as $ symbol.</p>
+        </div>
+        
         <hr class="featurette-divider">
 
         <!-- Footer -->
