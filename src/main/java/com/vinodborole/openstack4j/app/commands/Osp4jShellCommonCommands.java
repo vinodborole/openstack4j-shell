@@ -278,7 +278,7 @@ public class Osp4jShellCommonCommands implements IOsp4jShellCommands {
             }
             break;
             default:
-                System.err.println("Invaid command");
+                throw new Exception("Invalid Command!"); 
         
         }
         

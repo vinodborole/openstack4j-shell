@@ -4,13 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import com.vinodborole.openstack4j.app.api.CinderAPI;
 import com.vinodborole.openstack4j.app.commands.factory.IOsp4jShellCommands;
 import com.vinodborole.openstack4j.app.utils.Osp4jShellCommmandHelpInfo;
+import com.vinodborole.openstack4j.app.utils.OspPrintWriter;
 /**
  * Responsible for executing cinder commands on Openstack cloud
  *  
@@ -96,37 +96,37 @@ public class Osp4jShellCinderCommands extends Osp4jShellCommands implements IOsp
         switch(subcommand!=null?subcommand:Commands.NULL){
             case CREATE:
             {
-                Options volumeCreateOptions=getVolumeCreateOptions();
+                Options volumeCreateOptions=Osp4jShellCommonCommandOptions.getCinderCreateHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(volumeCreateOptions, Arrays.copyOfRange(args, 2, args.length));
                     CinderAPI.createVolume(Integer.valueOf(line.getOptionValue("size")), line.getOptionValue("name"));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], volumeCreateOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], volumeCreateOptions);
                 }
             }
             break;
             case CREATE_FROM_IMAGE:
             {
-                Options volumeCreateFromImageOptions=getVolumeCreateFromImageOptions();
+                Options volumeCreateFromImageOptions=Osp4jShellCommonCommandOptions.getCinderCreateFromImageHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(volumeCreateFromImageOptions, Arrays.copyOfRange(args, 2, args.length));
                     CinderAPI.createVolumeFromImage(line.getOptionValue("id"), Integer.valueOf(line.getOptionValue("size")), line.getOptionValue("name"));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], volumeCreateFromImageOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1],  volumeCreateFromImageOptions);
                 }
             }
             break;
             case CREATE_FROM_VOLUME_SNAPSHOT:
             {
-                Options volumeCreateFromSnapshotOptions=getVolumeCreateFromSnapshotOptions();
+                Options volumeCreateFromSnapshotOptions=Osp4jShellCommonCommandOptions.getCinderCreateFromSnapshotHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(volumeCreateFromSnapshotOptions, Arrays.copyOfRange(args, 2, args.length));
                     CinderAPI.createVolumeFromVolumeSnap(line.getOptionValue("id"), Integer.valueOf(line.getOptionValue("size")), line.getOptionValue("name"));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], volumeCreateFromSnapshotOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1],  volumeCreateFromSnapshotOptions);
                 }
             }
             break;
@@ -137,13 +137,13 @@ public class Osp4jShellCinderCommands extends Osp4jShellCommands implements IOsp
             break;
             case SHOW:
             {
-                Options volumeShowOptions=getVolumeShowOptions();
+                Options volumeShowOptions=Osp4jShellCommonCommandOptions.getCinderShowHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(volumeShowOptions, Arrays.copyOfRange(args, 2, args.length));
                     CinderAPI.show(line.getOptionValue("id"));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], volumeShowOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1],  volumeShowOptions);
                 }
             }
             break;
@@ -159,87 +159,39 @@ public class Osp4jShellCinderCommands extends Osp4jShellCommands implements IOsp
             break;
             case DELETE:
             {
-                Options volumeDeleteOptions=getVolumeDeleteOptions();
+                Options volumeDeleteOptions=Osp4jShellCommonCommandOptions.getCinderDeleteHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(volumeDeleteOptions, Arrays.copyOfRange(args, 2, args.length));
                     boolean isVolDeleted = CinderAPI.deleteVolume(line.getOptionValue("id"));
                     System.out.println("Result: "+isVolDeleted);
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], volumeDeleteOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1],  volumeDeleteOptions);
                 }
            }
             break;
             case UPLOAD_TO_IMAGE:
             {
-                Options volumeToImageOptions=getVolumeToImageOptions();
+                Options volumeToImageOptions=Osp4jShellCommonCommandOptions.getCinderUploadToImageHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(volumeToImageOptions, Arrays.copyOfRange(args, 2, args.length));
                     CinderAPI.uploadVolumeToImage(line.getOptionValue("id"), line.getOptionValue("name"));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], volumeToImageOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1],  volumeToImageOptions);
                 }
             }
             break;
             case NULL:;
             case HELP:
             {
-                subCommandhelpFormatter.printHelp(args[0], getHelpOptions());
+                OspPrintWriter.printHelp(args[0], Osp4jShellCommonCommandOptions.getCinderHelpOptions());
             }
             break;
             default:
-                break; 
+                throw new Exception("Invalid Command!"); 
         }        
     }
-    private Options getHelpOptions() {
-        Options options = new Options();
-        options.addOption(Option.builder("help").longOpt("help").argName("help").desc("Help for cinder commands.").build());
-        options.addOption(Option.builder("cinderlist").hasArg(false).longOpt("list").argName("list").desc("List volumes.").build());
-        options.addOption(Option.builder("cindershow").hasArg(true).longOpt("show").argName("show").desc("Show volume details").build());
-        options.addOption(Option.builder("createfromvolumesnapshot").hasArg(true).longOpt("create-from-volume-snapshot").argName("create-from-volume-snapshot").desc("Create volume from snapshot").build());
-        options.addOption(Option.builder("createfromimage").hasArg(true).longOpt("create-from-image").argName("create-from-image").desc("Create volume from Image").build());
-        options.addOption(Option.builder("volumeattach").hasArg(true).longOpt("volume-attach").argName("volume-attach").desc("Attach volume").build());
-        options.addOption(Option.builder("volumedettach").hasArg(true).longOpt("volume-dettach").argName("volume-dettach").desc("Dettach volume").build());
-        options.addOption(Option.builder("volumedelete").hasArg(true).longOpt("delete").argName("delete").desc("Delete volume").build());
-        options.addOption(Option.builder("volumeuploadtoimage").hasArg(true).longOpt("upload-to-image").argName("upload-to-image").desc("Upload volume to image").build());
-        return options;
-    }
-    private Options getVolumeToImageOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An indentifier for the volume",true));
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the volume",true));
-        return options;
-    }
-    private Options getVolumeDeleteOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An indentifier for the volume",true));
-        return options;
-    }
-    private Options getVolumeShowOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An indentifier for the volume",true));
-        return options;
-    }
-    private Options getVolumeCreateFromSnapshotOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the volume",true));
-        options.addOption(Osp4jShellCommonCommandOptions.sizeOption("Expected Volume size",true));
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An indentifier for the snapshot",true));
-        return options;
-    }
-    private Options getVolumeCreateFromImageOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the volume",true));
-        options.addOption(Osp4jShellCommonCommandOptions.sizeOption("Expected Volume size",true));
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An indentifier for the image",true));
-        return options;
-    }
-    private Options getVolumeCreateOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.sizeOption("Expected Volume size",true));
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the volume",true));
-        return options;
-    }
-
+    
+    
 }

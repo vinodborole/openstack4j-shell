@@ -16,6 +16,7 @@ import com.vinodborole.openstack4j.app.api.NeutronAPI;
 import com.vinodborole.openstack4j.app.api.NovaAPI;
 import com.vinodborole.openstack4j.app.commands.factory.IOsp4jShellCommands;
 import com.vinodborole.openstack4j.app.utils.Osp4jShellCommmandHelpInfo;
+import com.vinodborole.openstack4j.app.utils.OspPrintWriter;
 /**
  * Responsible for executing nova commands on Openstack cloud
  *  
@@ -182,7 +183,7 @@ public class Osp4jShellNovaCommands extends Osp4jShellCommands implements IOsp4j
         switch(subcommand!=null?subcommand:Commands.NULL){
             case START:
             {
-                Options serverStartOptions=getServerStartOptions();
+                Options serverStartOptions=Osp4jShellCommonCommandOptions.getNovaStartHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverStartOptions, Arrays.copyOfRange(args, 2, args.length));
                     ActionResponse response = NovaAPI.startVM(line.getOptionValue("id"));
@@ -193,14 +194,14 @@ public class Osp4jShellNovaCommands extends Osp4jShellCommands implements IOsp4j
                     }
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverStartOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverStartOptions);
                 }
                 
             }
             break;
             case STOP:
             {
-                Options serverStopOptions=getServerStopOptions();
+                Options serverStopOptions=Osp4jShellCommonCommandOptions.getNovaStopHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverStopOptions, Arrays.copyOfRange(args, 2, args.length));
                     boolean response = NovaAPI.stopVM(line.getOptionValue("id"));
@@ -211,14 +212,14 @@ public class Osp4jShellNovaCommands extends Osp4jShellCommands implements IOsp4j
                     }
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverStopOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverStopOptions);
                 }
                 
            }
             break;
             case RESTART:
             {
-                Options serverRestartOptions=getServerRestartOptions();
+                Options serverRestartOptions=Osp4jShellCommonCommandOptions.getNovaRestartHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverRestartOptions, Arrays.copyOfRange(args, 2, args.length));
                     ActionResponse response = NovaAPI.restartVM(line.getOptionValue("id"));
@@ -229,33 +230,20 @@ public class Osp4jShellNovaCommands extends Osp4jShellCommands implements IOsp4j
                     }
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverRestartOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverRestartOptions);
                 }
             }
             break;
             case DOWNLOAD:
             {
-                Options serverDownloadOptions=getServerDownloadOptions();
+                Options serverDownloadOptions=Osp4jShellCommonCommandOptions.getNovaDownloadHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverDownloadOptions, Arrays.copyOfRange(args, 2, args.length));
                     boolean response=NovaAPI.downloadVM(line.getOptionValue("id"),line.getOptionValue("file"),line.getOptionValue("name"));
                     System.out.println(response);
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverDownloadOptions);
-                }
-            }
-            break;
-            case IMAGE_CREATE:
-            {
-                Options serverImageCreateOptions=getServerImageCreateOptions();
-                try{
-                    CommandLine line = subCommandParser.parse(serverImageCreateOptions, Arrays.copyOfRange(args, 2, args.length));
-                    String imageId=NovaAPI.createSnapshot(line.getOptionValue("id"),line.getOptionValue("name"));
-                    GlanceAPI.printImageDetails(GlanceAPI.getImageDetail(imageId));
-                }catch(ParseException e){
-                    System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverImageCreateOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverDownloadOptions);
                 }
             }
             break;
@@ -266,59 +254,59 @@ public class Osp4jShellNovaCommands extends Osp4jShellCommands implements IOsp4j
             break;
             case BOOT:
             {
-                Options serverBootOptions=getServerBootCreateOptions();
+                Options serverBootOptions=Osp4jShellCommonCommandOptions.getNovaBootHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverBootOptions, Arrays.copyOfRange(args, 2, args.length));
                     String serverId= NovaAPI.boot(line.getOptionValue("id"),line.getOptionValue("falvorid"),line.getOptionValue("netid"),line.getOptionValue("name"),false);
                     NovaAPI.printServerDetails(NovaAPI.getServer(serverId));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverBootOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverBootOptions);
                 }
             }
             break;
             case BOOT_VOLUME:
             {
-                Options serverBootOptions=getServerBootCreateOptions();
+                Options serverBootOptions=Osp4jShellCommonCommandOptions.getNovaBootVolumeHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverBootOptions, Arrays.copyOfRange(args, 2, args.length));
                     String serverId = NovaAPI.boot(line.getOptionValue("id"),line.getOptionValue("falvorid"),line.getOptionValue("netid"),line.getOptionValue("name"),true);
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverBootOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverBootOptions);
                 }
                
             }
             break;
             case BOOT_DEFAULT:
             { 
-                Options serverBootDefaultOptions=getServerBootDefaultOptions();
+                Options serverBootDefaultOptions=Osp4jShellCommonCommandOptions.getNovaBootDefaultHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverBootDefaultOptions, Arrays.copyOfRange(args, 2, args.length));
                     String serverId=NovaAPI.bootdefault(line.getOptionValue("id"),line.getOptionValue("name"));
                     NovaAPI.printServerDetails(NovaAPI.getServer(serverId));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverBootDefaultOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverBootDefaultOptions);
                 }
             }
             break;
             case BOOT_VOLUME_DEFAULT:
             {
-                Options serverBootVolumeDefaultOptions=getServerBootVolumeDefaultOptions();
+                Options serverBootVolumeDefaultOptions=Osp4jShellCommonCommandOptions.getNovaBootVolumeDefaultHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverBootVolumeDefaultOptions, Arrays.copyOfRange(args, 2, args.length));
                     String serverId=NovaAPI.bootvolumedefault(line.getOptionValue("id"),line.getOptionValue("name"));
                     NovaAPI.printServerDetails(NovaAPI.getServer(serverId));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverBootVolumeDefaultOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverBootVolumeDefaultOptions);
                 }
             }
             break;
             case BOOT_CUSTOM:
             {
-                Options serverBootCustomOptions=getServerBootCustomOptions();
+                Options serverBootCustomOptions=Osp4jShellCommonCommandOptions.getNovaBootCustomHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverBootCustomOptions, Arrays.copyOfRange(args, 2, args.length));
                     Map<String, String> ids = new HashMap<String,String>();
@@ -333,13 +321,13 @@ public class Osp4jShellNovaCommands extends Osp4jShellCommands implements IOsp4j
                     }
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverBootCustomOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverBootCustomOptions);
                 }
             }
             break;
             case BOOT_VOLUME_CUSTOM:
             {
-                Options serverBootVolumeCustomOptions=getServerBootVolumeCustomOptions();
+                Options serverBootVolumeCustomOptions=Osp4jShellCommonCommandOptions.getNovaBootVolumeCustomHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverBootVolumeCustomOptions, Arrays.copyOfRange(args, 2, args.length));
                     Map<String, String> ids = new HashMap<String,String>();
@@ -354,44 +342,44 @@ public class Osp4jShellNovaCommands extends Osp4jShellCommands implements IOsp4j
                     }
                 }catch(ParseException e){
                     System.out.println(e.getMessage()); 
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverBootVolumeCustomOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverBootVolumeCustomOptions);
                 }
             }
             break;
             case DELETE:
             {
-                Options serverDeleteOptions=getServerDeleteOptions();
+                Options serverDeleteOptions=Osp4jShellCommonCommandOptions.getNovaDeleteHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverDeleteOptions, Arrays.copyOfRange(args, 2, args.length));
                     NovaAPI.delete(line.getOptionValue("id"));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverDeleteOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverDeleteOptions);
                 }
             }
             break;
             case STATUS:
             {
-                Options serverStatusOptions=getServerStatusOptions();
+                Options serverStatusOptions=Osp4jShellCommonCommandOptions.getNovaStatusHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverStatusOptions, Arrays.copyOfRange(args, 2, args.length));
                     NovaAPI.status(line.getOptionValue("id"));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverStatusOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverStatusOptions);
                 }
             }
             break;
             case SNAPSHOT:
             {
-                Options serverSnapshotOptions=getServerSnapshotOptions();
+                Options serverSnapshotOptions=Osp4jShellCommonCommandOptions.getNovaSnapshotHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverSnapshotOptions, Arrays.copyOfRange(args, 2, args.length));
                     String imageId=NovaAPI.createSnapshot(line.getOptionValue("id"), line.getOptionValue("name"));
                     GlanceAPI.printImageDetails(GlanceAPI.getImageDetail(imageId));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverSnapshotOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverSnapshotOptions);
                 }
             }
             break;
@@ -402,114 +390,26 @@ public class Osp4jShellNovaCommands extends Osp4jShellCommands implements IOsp4j
             break;
             case SHOW:
             {
-                Options serverShowOptions=getServerShowOptions();
+                Options serverShowOptions=Osp4jShellCommonCommandOptions.getNovaShowHelpOptions();
                 try{
                     CommandLine line = subCommandParser.parse(serverShowOptions, Arrays.copyOfRange(args, 2, args.length));
                     NovaAPI.printServerDetails(NovaAPI.getServer(line.getOptionValue("id")));
                 }catch(ParseException e){
                     System.out.println(e.getMessage());
-                    subCommandhelpFormatter.printHelp(args[0]+" "+args[1], serverShowOptions);
+                    OspPrintWriter.printHelp(args[0]+" "+args[1], serverShowOptions);
                 }
             }
             break;
             case NULL:;
             case HELP:
             {
-                subCommandhelpFormatter.printHelp(args[0], getHelpOptions());
+                OspPrintWriter.printHelp(args[0], Osp4jShellCommonCommandOptions.getNeutronHelpOptions());
             }
             break;
             default:
-                break;
+                throw new Exception("Invalid Command!"); 
         }        
     }
-    private Options getHelpOptions() {
-        return Osp4jShellCommonCommandOptions.novaOptions();
-    }
-    private Options getServerShowOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the server",true));
-        return options;
-    }
-    private Options getServerSnapshotOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the server",true));
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the server.",true));
-        return options;
-    }
-    private Options getServerStatusOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the server",true));
-        return options;
-    }
-    private Options getServerDeleteOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the server",true));
-        return options;
-    }
-    private Options getServerBootVolumeCustomOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the Volume",true));
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the server.",true));
-        options.addOption(Osp4jShellCommonCommandOptions.cidrOption("A cidr for the network to be created.",true));
-        return options;
-    }
-    private Options getServerBootCustomOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the Image",true));
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the server.",true));
-        options.addOption(Osp4jShellCommonCommandOptions.vcpuOption("vcpu information", true));
-        options.addOption(Osp4jShellCommonCommandOptions.diskOption("disk size", true));
-        options.addOption(Osp4jShellCommonCommandOptions.ramOption("ram size", true));
-        options.addOption(Osp4jShellCommonCommandOptions.cidrOption("A cidr for the network to be created.",true));
-        return options;
-    }
-    private Options getServerBootVolumeDefaultOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the Volume",true));
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the server.",true));
-        return options;
-    }
-    private Options getServerBootDefaultOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the Image",true));
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the server.",true));
-        return options;
-    }
-    private Options getServerBootCreateOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the Image",true));
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the server.",true));
-        options.addOption(Osp4jShellCommonCommandOptions.flavorOption("An identifier for the flavor .",true));
-        options.addOption(Osp4jShellCommonCommandOptions.netIdOption("An identifier for the network .",true));
-        return options;
-    }
-    private Options getServerImageCreateOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the server",true));
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the server.",true));
-        return options;
-    }
-    private Options getServerDownloadOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the server",true));
-        options.addOption(Osp4jShellCommonCommandOptions.nameOption("A name for the server.",true));
-        options.addOption(Osp4jShellCommonCommandOptions.fileOption("Local Path to download the server.",true));
-        return options;
-    }
-    private Options getServerRestartOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the server",true));
-        return options;
-    }
-    private Options getServerStopOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the server",true));
-        return options;
-    }
-    private Options getServerStartOptions() {
-        Options options = new Options();
-        options.addOption(Osp4jShellCommonCommandOptions.idOption("An identifier for the server",true));
-        return options;
-    }
+    
 
 }

@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.openstack4j.model.image.Image;
@@ -13,6 +12,7 @@ import com.vinodborole.openstack4j.app.api.CommonAPI;
 import com.vinodborole.openstack4j.app.api.GlanceAPI;
 import com.vinodborole.openstack4j.app.commands.factory.IOsp4jShellCommands;
 import com.vinodborole.openstack4j.app.utils.Osp4jShellCommmandHelpInfo;
+import com.vinodborole.openstack4j.app.utils.OspPrintWriter;
 /**
  * Responsible for executing glance commands on Openstack cloud
  *  
@@ -81,7 +81,7 @@ public class Osp4jShellGlanceCommands extends Osp4jShellCommands implements IOsp
            break;
            case IMAGE_CREATE:
            {
-               Options imageCreateOptions=getImageCreateOptions();
+               Options imageCreateOptions=Osp4jShellCommonCommandOptions.getGlanceImageCreateHelpOptions();
                try{
                    CommandLine line = subCommandParser.parse(imageCreateOptions, Arrays.copyOfRange(args, 2, args.length));
                    Image image= GlanceAPI.imageCreate(line.getOptionValue("file"),line.getOptionValue("name"));
@@ -91,58 +91,32 @@ public class Osp4jShellGlanceCommands extends Osp4jShellCommands implements IOsp
                        System.err.println("Upload failed");
                    }
                }catch(ParseException e){
-                   subCommandhelpFormatter.printHelp(args[0]+" "+args[1], imageCreateOptions);
+                   OspPrintWriter.printHelp(args[0]+" "+args[1], imageCreateOptions);
                }
            }
            break;
            case IMAGE_DOWNLOAD:
            {
-               Options imageDownloadOptions=getImageDownloadOptions();
+               Options imageDownloadOptions=Osp4jShellCommonCommandOptions.getGlanceImageDownloadHelpOptions();
                try{
                    CommandLine line = subCommandParser.parse(imageDownloadOptions, Arrays.copyOfRange(args, 2, args.length));
                    boolean status=CommonAPI.downloadImage(line.getOptionValue("id"), line.getOptionValue("file"), line.getOptionValue("name"));
                    System.out.println("Download status: "+status); 
                }catch(ParseException e){
                    System.out.println(e.getMessage());
-                   subCommandhelpFormatter.printHelp(args[0]+" "+args[1], imageDownloadOptions);
+                   OspPrintWriter.printHelp(args[0]+" "+args[1], imageDownloadOptions);
                }
            }
            break;
            case NULL:;
            case HELP:
            { 
-               subCommandhelpFormatter.printHelp(args[0], getHelpOptions());
+               OspPrintWriter.printHelp(args[0], Osp4jShellCommonCommandOptions.getGlanceHelpOptions());
            }
            break;
            default:
-               break;
+               throw new Exception("Invalid Command!"); 
        }
        
     }
-    private Options getHelpOptions() {
-        return Osp4jShellCommonCommandOptions.glanceOptions();
-    }
-    private Options getImageDownloadOptions() {
-        Option imageIDOption=Osp4jShellCommonCommandOptions.idOption("An identifier for the image to be downloaded.", true);     
-        Option fileDwOption=Osp4jShellCommonCommandOptions.fileOption("Local Path to download the image.",true);
-        Option nameOption=Osp4jShellCommonCommandOptions.nameOption("Descriptive name for the image.",true);     
-        Options options = new Options();
-        options.addOption(imageIDOption);
-        options.addOption(fileDwOption);
-        options.addOption(nameOption);
-        return options;
-    }
-    private Options getImageCreateOptions() {
-        Option fileOption=Osp4jShellCommonCommandOptions.fileOption("Local file that contains disk image to be uploaded during creation.",true);
-        Option nameOption=Osp4jShellCommonCommandOptions.nameOption("Descriptive name for the image.",true);     
-        Options options = new Options();
-        options.addOption(fileOption);
-        options.addOption(nameOption);
-        return options;
-    }
-    private Options getImageListOptions() {
-        Options options= new Options();
-        return options;
-    }
-
 }

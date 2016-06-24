@@ -19,7 +19,7 @@ public class Osp4jShellCommandsFactory {
         return INSTANCE;
     }    
     
-    public IOsp4jShellCommands getShellCommandExecutor(Commands command){
+    public IOsp4jShellCommands getShellCommandExecutor(Commands command) throws Exception{
         
         switch(command!=null?command:command.NULL){
             case NOVA:
@@ -47,9 +47,7 @@ public class Osp4jShellCommandsFactory {
             case HELP:
                 return Osp4jShellCommonCommands.getInstance();
             default:
-                System.err.println("Invaid command");
+                throw new Exception("Invalid Command!"); 
         }
-        
-        return null;
     }
 }
