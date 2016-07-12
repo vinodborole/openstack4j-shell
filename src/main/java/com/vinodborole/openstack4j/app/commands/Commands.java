@@ -86,5 +86,45 @@ public enum Commands {
         return null;
       }
     
+    
+    public enum Arguments{
+        NAME("name"),
+        NETID("netid"),
+        SIZE("size"),
+        ID("id"),
+        ROUTERID("routerid"),
+        SERVERID("serverid"),
+        VOLUMEID("volumeid"),
+        IMAGEID("imgid"),
+        FLAVORID("flavorid"),
+        SUBNETID("subnetid"),
+        FILE("file"),
+        VCPU("vcpu"),
+        RAM("ram"),
+        DISK("disk"),
+        CIDR("cidr");
+        
+        private String argString;
+        private Arguments(String arg){
+            this.argString=arg;
+        }
+       
+        public String getArgString(){
+            return this.argString;
+        }
+        
+        public static Arguments fromString(String text) {
+            if (text != null) {
+              for (Arguments a : Arguments.values()) {
+                  if(a!=null)
+                      if (text.equalsIgnoreCase(a.argString)) {
+                          return a; 
+                      }
+              }
+            }
+            return null;
+          }
+        
+    }
 
 }

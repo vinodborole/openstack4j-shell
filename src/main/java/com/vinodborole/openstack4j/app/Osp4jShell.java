@@ -21,21 +21,23 @@ import com.vinodborole.openstack4j.app.commands.factory.Osp4jShellCommandsFactor
 public class Osp4jShell {
     public static void main(String[] args) throws Exception {
         if(args.length>0 && !Strings.isNullOrEmpty(args[0]) && args[0].equalsIgnoreCase("testsuite")){
-            externalSource(args);
+            fileSource(args);
         }else{
             printSignature();
             cliSource();
         }
     }
-    private static void externalSource(String[] args) throws FileNotFoundException, IOException, Exception {
+    private static void fileSource(String[] args) throws FileNotFoundException, IOException, Exception {
         if(!Strings.isNullOrEmpty(args[1])){
             File file = new File(args[1]);
-            FileReader fileReader = new FileReader(file);
-            BufferedReader console = new BufferedReader(fileReader);
-            while (true) {
-                String commandLine = console.readLine();
-                commandLine=filterCommandLine(commandLine);
-                evaluateCommand(commandLine);
+           try( 
+                FileReader fileReader = new FileReader(file);
+                BufferedReader console = new BufferedReader(fileReader)){
+                while (true) {
+                    String commandLine = console.readLine();
+                    commandLine=filterCommandLine(commandLine);
+                    evaluateCommand(commandLine);
+                }
             }
         }else{
             System.out.println("Missing arguments, please use following command.");
@@ -44,24 +46,26 @@ public class Osp4jShell {
         }
     }
     private static void cliSource() throws Exception {
-        BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-        while (true) {
-            try{
-                System.out.print("osp>");
-                String commandLine = bufferRead.readLine();
-                commandLine=filterCommandLine(commandLine);
-                evaluateCommand(commandLine);
-            }catch(Exception e){System.out.println("Exception: "+e.getMessage()); e.printStackTrace();System.out.println("Type 'help' for command information");}
+        try(BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in))){
+            while (true) {
+                try{
+                    System.out.print("osp>");
+                    String commandLine = bufferRead.readLine();
+                    commandLine=filterCommandLine(commandLine);
+                    evaluateCommand(commandLine);
+                }catch(Exception e){System.out.println("Exception: "+e.getMessage()); e.printStackTrace();System.out.println("Type 'help' for command information");}
+            }
         }
     }
     private static void printSignature() throws Exception {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         InputStream is = classLoader.getResourceAsStream("signature.txt");
-        InputStreamReader r = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(r);
-        String line = null;
-        while ((line = br.readLine()) != null) {
-          System.out.println(line);
+        try(InputStreamReader r = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(r)){
+            String line = null;
+            while ((line = br.readLine()) != null) {
+              System.out.println(line);
+            }
         }
     }
     private static String filterCommandLine(String commandLine) {

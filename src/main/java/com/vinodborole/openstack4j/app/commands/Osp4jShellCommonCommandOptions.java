@@ -14,6 +14,8 @@ public class Osp4jShellCommonCommandOptions {
     private static Options glanceHelpOptions;
     private static Options neutronHelpOptions;
     private static Options cinderHelpOptions;
+    private static Options printHelpOptions;
+    private static Options deleteHelpOptions;
     
     //nova command help
     private static Options novaShowHelpOptions;
@@ -56,7 +58,11 @@ public class Osp4jShellCommonCommandOptions {
     private static Options neutronNetCreateDefaultHelpOptions;
     
     static {
-        novaShowHelpOptions=constructNovaOptions();
+        
+        printHelpOptions=constructPrintHelpOptions();
+        deleteHelpOptions=constructDeleteHelpOptions();
+        
+        novaHelpOptions=constructNovaOptions();
         glanceHelpOptions=constructGlanceOptions();
         neutronHelpOptions=constructNeutronOptions();
         cinderHelpOptions=constructCinderOptions();
@@ -104,6 +110,7 @@ public class Osp4jShellCommonCommandOptions {
     public static Options getCinderVolumeAttachHelpOptions() {
         return cindervolumeAttachHelpOptions;
     }
+   
     public static Options getCinderVolumeDettachHelpOptions() {
         return cindervolumeDettachHelpOptions;
     }
@@ -212,54 +219,46 @@ public class Osp4jShellCommonCommandOptions {
     public static Options getNeutronNetCreateDefaultHelpOptions() {
         return neutronNetCreateDefaultHelpOptions;
     }
-    @Deprecated
-    public static Options glanceOptions() {
-        Options options = new Options();
-        options.addOption(Option.builder("imageCreate").hasArg(true).longOpt("image-create").argName("image-create").desc("Create a new image.").build());
-        options.addOption(Option.builder("imageList").hasArg(false).longOpt("image-list").argName("image-list").desc("List images you can access.").build());
-        options.addOption(Option.builder("imageDowload").hasArg(true).longOpt("image-download").argName("image-download").desc("Download a specific image.").build());
-        return options;
+    public static Options getPrintHelpOptions() {
+        return printHelpOptions;
     }
-    @Deprecated
-    public static Options neutronOptions() {
-        Options options = new Options();
-        options.addOption(Option.builder("help").longOpt("help").argName("help").desc("Help for neutron commands.").build());
-        options.addOption(Option.builder("netlist").hasArg(false).longOpt("net-list").argName("net-list").desc("List networks.").build());
-        options.addOption(Option.builder("netshow").hasArg(true).longOpt("net-show").argName("net-show").desc("Show network details").build());
-        options.addOption(Option.builder("netcreate").hasArg(true).longOpt("net-create").argName("net-create").desc("Create a new network").build());
-        options.addOption(Option.builder("netdelete").hasArg(true).longOpt("net-delete").argName("net-delete").desc("Delete the network").build());
-        options.addOption(Option.builder("netcreatedefault").hasArg(true).longOpt("net-create-default").argName("net-create-default").desc("Create network, subnet and router with default settings").build());
-        options.addOption(Option.builder("routerlist").hasArg(false).longOpt("router-list").argName("router-list").desc("List Routers.").build());
-        options.addOption(Option.builder("routercreate").hasArg(true).longOpt("router-create").argName("router-create").desc("Create a  Routers.").build());
-        options.addOption(Option.builder("routerdelete").hasArg(true).longOpt("router-delete").argName("router-delete").desc("Delete the Routers.").build());
-        options.addOption(Option.builder("routershow").hasArg(true).longOpt("router-show").argName("router-show").desc("Show router details.").build());
-        options.addOption(Option.builder("routerinterfaceadd").hasArg(true).longOpt("router-interface-add").argName("router-interface-add").desc("Create the router interface for the given subnet.").build());
-        options.addOption(Option.builder("routerinterfacedelete").hasArg(true).longOpt("router-interface-delete").argName("router-interface-delete").desc("Delete the router interface of the given subnet.").build());
-        return options;
-    }
-    @Deprecated
-    public static Options novaOptions() {
-        Options options = new Options();
-        options.addOption(Option.builder("help").longOpt("help").argName("help").desc("Help for nova commands.").build());
-        options.addOption(Option.builder("novastart").hasArg(true).longOpt("start").argName("start").desc("Star server").build());
-        options.addOption(Option.builder("novastop").hasArg(true).longOpt("stop").argName("stop").desc("Stop server").build());
-        options.addOption(Option.builder("novarestart").hasArg(true).longOpt("restart").argName("restart").desc("Restart server").build());
-        options.addOption(Option.builder("novadownload").hasArg(true).longOpt("download").argName("download").desc("Download server").build());
-        options.addOption(Option.builder("novaflavorlist").hasArg(false).longOpt("flavor-list").argName("flavor-list").desc("List Flavor.").build());
-        options.addOption(Option.builder("novaboot").hasArg(true).longOpt("boot").argName("boot").desc("Create server").build());
-        options.addOption(Option.builder("novabootvolume").hasArg(true).longOpt("boot-volume").argName("boot-volume").desc("Create server from volume").build());
-        options.addOption(Option.builder("novabootdefault").hasArg(true).longOpt("boot-default").argName("boot-default").desc("Create server with default settings").build());
-        options.addOption(Option.builder("novabootvolumedefault").hasArg(true).longOpt("boot-volume-default").argName("boot-volume-default").desc("Create server from volume with default settings").build());
-        options.addOption(Option.builder("novabootcustom").hasArg(true).longOpt("boot-custom").argName("boot-custom").desc("Create server from custom settings").build());
-        options.addOption(Option.builder("novabootvolumecustom").hasArg(true).longOpt("boot-volume-custom").argName("boot-volume-custom").desc("Create server from volume with custom settings").build());
-        options.addOption(Option.builder("novadelete").hasArg(true).longOpt("delete").argName("delete").desc("Delete server").build());
-        options.addOption(Option.builder("novastatus").hasArg(true).longOpt("status").argName("status").desc("Get server status").build());
-        options.addOption(Option.builder("novasnapshot").hasArg(true).longOpt("snapshot").argName("snapshot").desc("Create snapshot for server").build());
-        options.addOption(Option.builder("novaflavorlist").hasArg(false).longOpt("list").argName("list").desc("List Servers.").build());
-        options.addOption(Option.builder("novashow").hasArg(true).longOpt("show").argName("show").desc("Show server details").build());
-        return options;
+    public static Options getDeleteHelpOptions() {
+        return deleteHelpOptions;
     }
 
+    private static Options constructDeleteHelpOptions() {
+        Option tenantAllInstance=Option.builder().longOpt(Commands.TENANT_ALL_INSTANCES.getCommandString()).hasArg(false).desc("Delete all tenant instances").build();
+        Option tenantAllVolumes=Option.builder().longOpt(Commands.TENANT_ALL_VOLUMES.getCommandString()).hasArg(false).desc("Delete all tenant volumes").build();
+        Option tenantAllVolumeSnapshots=Option.builder().longOpt(Commands.TENANT_ALL_VOLUME_SNAPSHOTS.getCommandString()).hasArg(false).desc("Delete all volume snapshots").build();
+        Option tenantAllImages=Option.builder().longOpt(Commands.TENANT_ALL_IMAGES.getCommandString()).hasArg(false).desc("Delete all images").build();
+        Option tenantAllSecurityGroupRules=Option.builder().longOpt(Commands.TENANT_ALL_SECURITY_GROUP_RULES.getCommandString()).hasArg(false).desc("Delete all security group rules").build();
+        Option tenantAllNetworks=Option.builder().longOpt(Commands.TENANT_ALL_NETWORKS.getCommandString()).hasArg(false).desc("Delete all networks").build();
+        Option tenantInfo=Option.builder().longOpt(Commands.TENANT_INFO.getCommandString()).hasArg(false).desc("Delete all tenant data (instance, networks, images, volumes, snapshots, routers)").build();
+        Option tenantAllRouters=Option.builder().longOpt(Commands.TENANT_ALL_ROUTERS.getCommandString()).hasArg(false).desc("Delete all tenant routers").build();
+
+        final Options options = new Options();
+        options.addOption(tenantAllInstance)
+        .addOption(tenantAllVolumes)
+        .addOption(tenantAllVolumeSnapshots)
+        .addOption(tenantAllImages)
+        .addOption(tenantAllSecurityGroupRules)
+        .addOption(tenantAllNetworks)
+        .addOption(tenantInfo)
+        .addOption(tenantAllRouters);
+        return options;
+    }
+    private static Options constructPrintHelpOptions() {
+        Option help=Option.builder().longOpt(Commands.HELP.getCommandString()).hasArg(false).desc("Show help").build();
+        Option config=Option.builder().longOpt(Commands.CONFIG.getCommandString()).hasArg(false).desc("Show config").build();
+        Option tenantList=Option.builder().longOpt(Commands.TENANT_LIST.getCommandString()).hasArg(false).desc("Show tenant list").build();
+        Option tenantShow=Option.builder().longOpt(Commands.TENANT_INFO.getCommandString()).hasArg(false).desc("Show current tenant details").build();
+        final Options options = new Options();
+        options.addOption(help)
+        .addOption(config)
+        .addOption(tenantList)
+        .addOption(tenantShow);
+        return options;
+    }
     private static Options constructNeutronNetCreateDefaultOptions() {
         final Options options = new Options();
         options.addOption(nameOption("Name of the network", true))
@@ -343,18 +342,20 @@ public class Osp4jShellCommonCommandOptions {
     }
 
     private static Options constructNeutronOptions() {
-        Option netShow=Option.builder("netShow").longOpt("net-show").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("netId").desc("Show network details").build();
-        Option netCreate=Option.builder("netCreate").longOpt("net-create").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("name").desc("Create a new network").build();
-        Option netDelete=Option.builder("netDelete").longOpt("net-delete").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("netId").desc("Delete the network").build();
-        Option routerCreate=Option.builder("routerCreate").longOpt("router-create").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("name").desc("Create a  Router").build();
-        Option routerDelete=Option.builder("routerDelete").longOpt("router-delete").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("routerId").desc("Delete the Router").build();
-        Option routerShow=Option.builder("routerShow").longOpt("router-show").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("routerId").desc("Show router details").build();
-        Option routerInterfaceAdd=Option.builder("routerInterfaceAdd").longOpt("router-interface-add").valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("routerId> <subnetId").desc("Create the router interface for the given subnet").build();
-        Option routerInterfaceDelete=Option.builder("routerInterfaceDelete").longOpt("router-interface-delete").valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("routerId> <subnetId").desc("Delete the router interface of the given subnet").build();
-        Option netCreateDefault=Option.builder("netCreateDefault").longOpt("net-create-default").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("name").desc("Create network, subnet and router with default settings").build();
+        Option netShow=Option.builder().longOpt(Commands.NET_SHOW.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("netId").desc("Show network details").build();
+        Option netCreate=Option.builder().longOpt(Commands.NET_CREATE.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("name").desc("Create a new network").build();
+        Option netDelete=Option.builder().longOpt(Commands.NET_DELETE.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("netId").desc("Delete the network").build();
+        Option routerCreate=Option.builder().longOpt(Commands.ROUTER_CREATE.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("name").desc("Create a  Router").build();
+        Option routerDelete=Option.builder().longOpt(Commands.ROUTER_DELETE.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("routerId").desc("Delete the Router").build();
+        Option routerShow=Option.builder().longOpt(Commands.ROUTER_SHOW.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("routerId").desc("Show router details").build();
+        Option routerInterfaceAdd=Option.builder().longOpt(Commands.ROUTER_INTERFACE_ADD.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("routerId> <subnetId").desc("Create the router interface for the given subnet").build();
+        Option routerInterfaceDelete=Option.builder().longOpt(Commands.ROUTER_INTERFACE_DELETE.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("routerId> <subnetId").desc("Delete the router interface of the given subnet").build();
+        Option netCreateDefault=Option.builder().longOpt(Commands.NET_CREATE_DEFAULT.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("name").desc("Create network, subnet and router with default settings").build();
+        Option netList=Option.builder().longOpt(Commands.NET_LIST.getCommandString()).valueSeparator(' ').hasArg(false).desc("List networks").build();
+        Option routerList=Option.builder().longOpt(Commands.ROUTER_LIST.getCommandString()).valueSeparator(' ').hasArg(false).desc("List Routers").build();
         final Options options = new Options();
-        options.addOption("netList", "net-list", false, "List networks")
-        .addOption("routerList", "router-list", false, "List Routers")
+        options.addOption(netList)
+        .addOption(routerList)
         .addOption(netShow)
         .addOption(netCreate)
         .addOption(netDelete)
@@ -369,10 +370,11 @@ public class Osp4jShellCommonCommandOptions {
     }
 
     private static Options constructGlanceOptions() {
-        Option imageCreate=Option.builder("imageCreate").longOpt("image-create").valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("imagePath> <name").desc("Create a new image").build();;
-        Option imageDowload=Option.builder("imageDownload").longOpt("image-download").valueSeparator(' ').hasArg(true).numberOfArgs(3).argName("imageId> <downloadlocation> <name").desc("Download a specific image").build();;
+        Option imageCreate=Option.builder().longOpt(Commands.IMAGE_CREATE.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("imagePath> <name").desc("Create a new image").build();;
+        Option imageDowload=Option.builder().longOpt(Commands.IMAGE_DOWNLOAD.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(3).argName("imageId> <downloadlocation> <name").desc("Download a specific image").build();;
+        Option imageList=Option.builder().longOpt(Commands.IMAGE_LIST.getCommandString()).valueSeparator(' ').hasArg(false).desc("List images").build();
         final Options options = new Options();
-        options.addOption("imageList", "image-list", false, "List images")
+        options.addOption(imageList)
         .addOption(imageCreate)
         .addOption(imageDowload)
         .addOption(helpOption());
@@ -381,23 +383,25 @@ public class Osp4jShellCommonCommandOptions {
 
     
     private static Options constructNovaOptions(){
-        Option show = Option.builder("show").longOpt("show").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Show server details").build();
-        Option start =Option.builder("start").longOpt("start").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Start server").build();
-        Option stop =Option.builder("stop").longOpt("stop").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Stop server").build();
-        Option restart =Option.builder("restart").longOpt("restart").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Restart server").build();
-        Option download =Option.builder("download").longOpt("download").valueSeparator(' ').hasArg(true).numberOfArgs(3).argName("serverId> <downloadlocation> <name").desc("Download server").build();
-        Option boot =Option.builder("boot").longOpt("boot").valueSeparator(' ').hasArg(true).numberOfArgs(4).argName("imageId> <flavorId> <netId> <name").desc("Create server").build();
-        Option bootVolume =Option.builder("bootVolume").longOpt("boot-volume").valueSeparator(' ').hasArg(true).numberOfArgs(4).argName("volumeId> <flavorId> <netId> <name").desc("Create server from volume").build();
-        Option bootDefault =Option.builder("bootDefault").longOpt("boot-default").valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("imageId> <name").desc("Create server with default settings").build();
-        Option bootVolumeDefault =Option.builder("bootVolumeDefault").longOpt("boot-volume-default").valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("volumeId> <name").desc("Create server from volume with default settings").build();
-        Option bootCustom =Option.builder("bootCustom").longOpt("boot-custom").valueSeparator(' ').hasArg(true).numberOfArgs(6).argName("imageId> <disk> <ram> <cpu> <cidr> <name").desc("Create server from custom settings").build();
-        Option bootVolumeCustom =Option.builder("bootVolumeCustom").longOpt("boot-volume-custom").valueSeparator(' ').hasArg(true).numberOfArgs(3).argName("volumeId> <cidr> <name").desc("Create server from volume with custom settings").build();
-        Option delete =Option.builder("delete").longOpt("delete").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Delete server").build();
-        Option status =Option.builder("status").longOpt("status").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Get server status").build();
-        Option snapshot =Option.builder("snapshot").longOpt("snapshot").valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("serverId> <name").desc("Create snapshot for server").build();
+        Option show = Option.builder().longOpt(Commands.SHOW.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Show server details").build();
+        Option start =Option.builder().longOpt(Commands.START.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Start server").build();
+        Option stop =Option.builder().longOpt(Commands.STOP.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Stop server").build();
+        Option restart =Option.builder().longOpt(Commands.RESTART.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Restart server").build();
+        Option download =Option.builder().longOpt(Commands.DOWNLOAD.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(3).argName("serverId> <downloadlocation> <name").desc("Download server").build();
+        Option boot =Option.builder().longOpt(Commands.BOOT.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(4).argName("imageId> <flavorId> <netId> <name").desc("Create server").build();
+        Option bootVolume =Option.builder().longOpt(Commands.BOOT_VOLUME.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(4).argName("volumeId> <flavorId> <netId> <name").desc("Create server from volume").build();
+        Option bootDefault =Option.builder().longOpt(Commands.BOOT_DEFAULT.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("imageId> <name").desc("Create server with default settings").build();
+        Option bootVolumeDefault =Option.builder().longOpt(Commands.BOOT_VOLUME_DEFAULT.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("volumeId> <name").desc("Create server from volume with default settings").build();
+        Option bootCustom =Option.builder().longOpt(Commands.BOOT_CUSTOM.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(6).argName("imageId> <disk> <ram> <cpu> <cidr> <name").desc("Create server from custom settings").build();
+        Option bootVolumeCustom =Option.builder().longOpt(Commands.BOOT_VOLUME_CUSTOM.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(3).argName("volumeId> <cidr> <name").desc("Create server from volume with custom settings").build();
+        Option delete =Option.builder().longOpt(Commands.DELETE.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Delete server").build();
+        Option status =Option.builder().longOpt(Commands.STATUS.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("serverId").desc("Get server status").build();
+        Option snapshot =Option.builder().longOpt(Commands.SNAPSHOT.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("serverId> <name").desc("Create snapshot for server").build();
+        Option list=Option.builder().longOpt(Commands.LIST.getCommandString()).valueSeparator(' ').hasArg(false).desc("List servers").build();
+        Option flavorList=Option.builder().longOpt(Commands.FLAVOR_LIST.getCommandString()).valueSeparator(' ').hasArg(false).desc("List flavors").build();
         final Options options = new Options();
-        options.addOption("list", "list", false, "List servers")
-        .addOption("flavorList", "flavor-list", false, "List flavors")
+        options.addOption(list)
+        .addOption(flavorList)
         .addOption(start)
         .addOption(stop)
         .addOption(restart)
@@ -523,18 +527,18 @@ public class Osp4jShellCommonCommandOptions {
     
     
     private static Options constructCinderOptions() {
-        Option show = Option.builder("show").longOpt("show").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("volumeId").desc("Show volume details").build();
-        Option createFromImage = Option.builder("createFromImage").longOpt("create-from-image").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("imageId> <size-in-gb> <name").desc("Create volume from Image").build();
-        Option createFromVolumeSnapshot = Option.builder("createFromVolumeSnapshot").longOpt("create-from-volume-snapshot").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("snapshotId> <size-in-gb> <name").desc("Create volume from snapshot").build();
+        Option show = Option.builder().longOpt(Commands.SHOW.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("volumeId").desc("Show volume details").build();
+        Option createFromImage = Option.builder().longOpt(Commands.CREATE_FROM_IMAGE.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("imageId> <size-in-gb> <name").desc("Create volume from Image").build();
+        Option createFromVolumeSnapshot = Option.builder().longOpt(Commands.CREATE_FROM_VOLUME_SNAPSHOT.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("snapshotId> <size-in-gb> <name").desc("Create volume from snapshot").build();
         
-        Option create = Option.builder("create").longOpt("create").valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("size-in-gb> <name").desc("Create volume").build();
-        Option volumeAttach= Option.builder("volumeAttach").longOpt("volume-attach").valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("serverId> <volumeId").desc("Attach volume").build();
-        Option volumeDettach= Option.builder("volumeDettach").longOpt("volume-dettach").valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("serverId> <volumeId").desc("Detach volume").build();
-        Option uploadToImage= Option.builder("uploadToImage").longOpt("upload-to-image").valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("volumeId> <name").desc("Upload volume to Glance").build();
-        Option delete= Option.builder("delete").longOpt("delete").valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("volumeId").desc("Delete volume").build();
-        
+        Option create = Option.builder().longOpt(Commands.CREATE.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("size-in-gb> <name").desc("Create volume").build();
+        Option volumeAttach= Option.builder().longOpt(Commands.VOLUME_ATTACH.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("serverId> <volumeId").desc("Attach volume").build();
+        Option volumeDettach= Option.builder().longOpt(Commands.VOLUME_DETTACH.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("serverId> <volumeId").desc("Detach volume").build();
+        Option uploadToImage= Option.builder().longOpt(Commands.UPLOAD_TO_IMAGE.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(2).argName("volumeId> <name").desc("Upload volume to Glance").build();
+        Option delete= Option.builder().longOpt(Commands.DELETE.getCommandString()).valueSeparator(' ').hasArg(true).numberOfArgs(1).argName("volumeId").desc("Delete volume").build();
+        Option list=Option.builder().longOpt(Commands.LIST.getCommandString()).valueSeparator(' ').hasArg(false).desc("List volumes").build();
         final Options options = new Options();
-        options.addOption("list", "list", false, "List volumes")
+        options.addOption(list)
                 .addOption(createFromImage)
                 .addOption(createFromVolumeSnapshot)
                 .addOption(helpOption())
@@ -606,52 +610,49 @@ public class Osp4jShellCommonCommandOptions {
         return options;
     }
     private static Option helpOption(){
-        return Option.builder("help").longOpt("help").desc("Help").build(); 
+        return Option.builder().longOpt(Commands.HELP.getCommandString()).desc("Help").build(); 
     }
     private static Option serverIdOption(String desc, boolean required) {
-        return Option.builder("serverId").hasArg(true).required(required).longOpt("serverId").type(String.class).numberOfArgs(1).argName("serverid").desc(desc).build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.SERVERID.getArgString()).type(String.class).numberOfArgs(1).argName(Commands.Arguments.SERVERID.getArgString()).desc(desc).build();     
     }
     private static Option idOption(String desc, boolean required) {
-        return Option.builder("id").hasArg(true).required(required).longOpt("id").type(String.class).numberOfArgs(1).argName("id").desc(desc).build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.ID.getArgString()).type(String.class).numberOfArgs(1).argName(Commands.Arguments.ID.getArgString()).desc(desc).build();     
     }
     private static Option volumeIdOption(boolean required) {
-        return Option.builder("volumeId").hasArg(true).required(required).longOpt("volumeid").type(String.class).numberOfArgs(1).argName("volumeid").desc("Volume Id").build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.VOLUMEID.getArgString()).type(String.class).numberOfArgs(1).argName(Commands.Arguments.VOLUMEID.getArgString()).desc("Volume Id").build();     
     }
     private static Option imageIdOption(boolean required) {
-        return Option.builder("imgId").hasArg(true).required(required).longOpt("imgid").type(String.class).numberOfArgs(1).argName("imgid").desc("Image Id").build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.IMAGEID.getArgString()).type(String.class).numberOfArgs(1).argName(Commands.Arguments.IMAGEID.getArgString()).desc("Image Id").build();     
     }
     private static Option flavorIdOption(boolean required) {
-        return Option.builder("flavorId").hasArg(true).required(required).longOpt("flavorid").type(String.class).numberOfArgs(1).argName("flavorid").desc("Flavor Id").build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.FLAVORID.getArgString()).type(String.class).numberOfArgs(1).argName(Commands.Arguments.FLAVORID.getArgString()).desc("Flavor Id").build();     
     }
     private static Option subnetIdOption(boolean required) {
-        return Option.builder("subnetId").hasArg(true).required(required).longOpt("subnetId").type(String.class).numberOfArgs(1).argName("subnetid").desc("Subnet Id").build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.SUBNETID.getArgString()).type(String.class).numberOfArgs(1).argName(Commands.Arguments.SUBNETID.getArgString()).desc("Subnet Id").build();     
     }
     private static Option sizeOption(String desc, boolean required) {
-        return Option.builder("size").hasArg(true).required(required).longOpt("size").type(Integer.class).numberOfArgs(1).argName("size").desc(desc).build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.SIZE.getArgString()).type(Integer.class).numberOfArgs(1).argName(Commands.Arguments.SIZE.getArgString()).desc(desc).build();     
     }
     private static Option nameOption(String desc, boolean required) {
-        return Option.builder("name").hasArg(true).required(required).type(String.class).numberOfArgs(1).longOpt("name").argName("name").desc(desc).build();     
+        return Option.builder().hasArg(true).required(required).type(String.class).numberOfArgs(1).longOpt(Commands.Arguments.NAME.getArgString()).argName(Commands.Arguments.NAME.getArgString()).desc(desc).build();     
     }
     private static Option fileOption(String desc, boolean required) {
-        return Option.builder("file").hasArg(true).required(required).longOpt("file").type(String.class).numberOfArgs(1).argName("file").desc(desc).build();     
-    }
-    private static Option flavorOption(String desc, boolean required) {
-        return Option.builder("falvorid").hasArg(true).required(required).longOpt("falvorid").type(String.class).numberOfArgs(1).argName("falvorid").desc(desc).build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.FILE.getArgString()).type(String.class).numberOfArgs(1).argName(Commands.Arguments.FILE.getArgString()).desc(desc).build();     
     }
     private static Option netIdOption(String desc, boolean required) {
-        return Option.builder("netid").hasArg(true).required(required).longOpt("netid").type(String.class).numberOfArgs(1).argName("netid").desc(desc).build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.NETID.getArgString()).type(String.class).numberOfArgs(1).argName(Commands.Arguments.NETID.getArgString()).desc(desc).build();     
     }
     private static Option vcpuOption(String desc, boolean required) {
-        return Option.builder("vcpu").hasArg(true).required(required).longOpt("vcpu").type(Integer.class).numberOfArgs(1).argName("vcpu").desc(desc).build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.VCPU.getArgString()).type(Integer.class).numberOfArgs(1).argName(Commands.Arguments.VCPU.getArgString()).desc(desc).build();     
     }
     private static Option ramOption(String desc, boolean required) {
-        return Option.builder("ram").hasArg(true).required(required).longOpt("ram").type(Integer.class).numberOfArgs(1).argName("ram").desc(desc).build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.RAM.getArgString()).type(Integer.class).numberOfArgs(1).argName(Commands.Arguments.RAM.getArgString()).desc(desc).build();     
     }
     private static Option diskOption(String desc, boolean required) {
-        return Option.builder("disk").hasArg(true).required(required).longOpt("disk").type(Integer.class).numberOfArgs(1).argName("disk").desc(desc).build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.DISK.getArgString()).type(Integer.class).numberOfArgs(1).argName(Commands.Arguments.DISK.getArgString()).desc(desc).build();     
     }
     private static Option cidrOption(String desc, boolean required) {
-        return Option.builder("cidr").hasArg(true).required(required).longOpt("cidr").type(String.class).numberOfArgs(1).argName("cidr").desc(desc).build();     
+        return Option.builder().hasArg(true).required(required).longOpt(Commands.Arguments.CIDR.getArgString()).type(String.class).numberOfArgs(1).argName(Commands.Arguments.CIDR.getArgString()).desc(desc).build();     
     }    
      
 }

@@ -15,6 +15,7 @@ public class OspPrintWriter {
             OutputStream out = System.out;
             final PrintWriter writer = new PrintWriter(out);
             final HelpFormatter helpFormatter = new HelpFormatter();
+            helpFormatter.setLongOptPrefix("");
             int printedRowWidth=500;
             String header="options:";
             int spacesBeforeOption=5;
@@ -50,4 +51,14 @@ public class OspPrintWriter {
                }
             }
      }
+    
+    public static boolean isHelpRequested(String command, String subCommand, String argument, Options commandOptions){
+        if(argument.equalsIgnoreCase("help")){
+            printHelp(command+" "+subCommand, commandOptions);
+            return true;
+        }else{
+            return false;
+        }
+        
+    }
 }

@@ -2,6 +2,7 @@
 package com.vinodborole.openstack4j.app;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -19,26 +20,21 @@ public class Osp4jSession {
     private static final Properties configprop = new Properties();
     private static OSClient os;
     public static void loadProperties(String propertyFilePath){
-        InputStream inputStream = null;
-        try {
-            System.out.println(propertyFilePath);
-            inputStream = new FileInputStream(propertyFilePath);
+        System.out.println(propertyFilePath);
+        try{
+            readProp(propertyFilePath);
+        }catch(Exception e){
+            System.err.println(e.getMessage());
+        }
+    }
+    private static void readProp(String propertyFilePath) throws IOException, FileNotFoundException {
+        try(InputStream inputStream = new FileInputStream(propertyFilePath)){
             if (inputStream != null) {
                 System.out.println("Loading Properties...");
                 configprop.load(inputStream);
                 System.out.println("Properties file loaded successfully!!");
             }else{
                 System.err.println("Invalid properties file!");
-            }
-        } catch (final Exception e) {
-            System.err.println("Exception: "+e.getMessage());
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (final IOException e) {
-                    System.err.println("Exception: "+e.getMessage());
-                }
             }
         }
     }
