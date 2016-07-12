@@ -1,0 +1,15 @@
+neutron security-group-create
+neutron security-group-delete
+neutron security-group-rule-create
+neutron security-group-rule-delete
+neutron security-group-rule-show
+neutron security-group-show
+
+
+neutron delete-net-default
+neutron router-interface-list
+neutron router-interface-show <networkId>
+
+neutron net-delete [should check if vm's are present if not delete interface in router and then network - throw exceptions]
+neutron router-delete [should check if networks interfaces associate have any vm's if not delete interfaces, delete networks and delete router]
+

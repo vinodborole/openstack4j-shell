@@ -1,5 +1,9 @@
 package com.vinodborole.openstack4j.app.commands;
-
+/**
+ * Global Commands ENUM
+ * 
+ * @author vinod borole
+ */
 public enum Commands {
 
     SOURCE("source"),
@@ -23,7 +27,18 @@ public enum Commands {
     NEUTRON("neutron"), 
     CINDER("cinder"),
     NET_LIST("net-list"), 
+    NET_CREATE_DEFAULT("net-create-default"),
+    NET_SHOW("net-show"),
+    NET_CREATE("net-create"),
+    NET_DELETE("net-delete"),
+    ROUTER_CREATE("router-create"),
+    ROUTER_DELETE("router-delete"),
+    ROUTER_LIST("router-list"),
+    ROUTER_SHOW("router-show"),
+    ROUTER_INTERFACE_ADD("router-interface-add"),
+    ROUTER_INTERFACE_DELETE("router-interface-delete"),
     BOOT("boot"), 
+    BOOT_DEFAULT("boot-default"),
     DELETE("delete"), 
     STATUS("status"), 
     RUN("run"), 
@@ -38,6 +53,9 @@ public enum Commands {
     SHOW("show"), 
     VOLUME_DETTACH("volume-dettach"), 
     BOOT_VOLUME("boot-volume"), 
+    BOOT_VOLUME_DEFAULT("boot-volume-default"),
+    BOOT_CUSTOM("boot-custom"),
+    BOOT_VOLUME_CUSTOM("boot-volume-custom"),
     SNAPSHOT("snapshot"), 
     UPLOAD_TO_IMAGE("upload-to-image"), 
     TENANT_ALL_INSTANCES("tenant-all-instances"), 
@@ -67,5 +85,46 @@ public enum Commands {
         }
         return null;
       }
+    
+    
+    public enum Arguments{
+        NAME("name"),
+        NETID("netid"),
+        SIZE("size"),
+        ID("id"),
+        ROUTERID("routerid"),
+        SERVERID("serverid"),
+        VOLUMEID("volumeid"),
+        IMAGEID("imgid"),
+        FLAVORID("flavorid"),
+        SUBNETID("subnetid"),
+        FILE("file"),
+        VCPU("vcpu"),
+        RAM("ram"),
+        DISK("disk"),
+        CIDR("cidr");
+        
+        private String argString;
+        private Arguments(String arg){
+            this.argString=arg;
+        }
+       
+        public String getArgString(){
+            return this.argString;
+        }
+        
+        public static Arguments fromString(String text) {
+            if (text != null) {
+              for (Arguments a : Arguments.values()) {
+                  if(a!=null)
+                      if (text.equalsIgnoreCase(a.argString)) {
+                          return a; 
+                      }
+              }
+            }
+            return null;
+          }
+        
+    }
 
 }

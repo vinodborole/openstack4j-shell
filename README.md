@@ -43,7 +43,7 @@ osp>help
 
 ## TestSuite Feature:
 
-This project also support a testsuite feature, where you write all the commands you would like to execute, best part of this feature is it uses an in memory feature to record all the important Id's of the objects created these id's are referred when the command has '$' as a parameter.
+This project also supports a testsuite feature, where you write all the commands you would like to execute, best part of this feature is it uses an in memory feature to record all the important Id's of the objects created these id's are referred when the command has '$' as a parameter.
 
 In order to run shell for a testsuite use following command
 ```
@@ -84,68 +84,262 @@ Type 'help' to checkout all the list of commands supported.
 
 ###### Basic Commands
 ```
-source <config.properties full path>
-help
-flush
-exit
+usage: source <config.properties full path>
+
+usage: help
+
+usage: flush
+
+usage: exit
+
 ```
 ###### Print Commands
 ```
-print help
-print config
-print tenant-list
-print tenant-info
+usage: print help
+
+usage: print config
+
+usage: print tenant-list
+
+usage: print tenant-info
 ```
 ###### Glance Commands
 ```
-glance help
-glance image-list
-glance image-create <imagePath> <name>
-glance image-download <imageId> <downloadlocation> <name>
+usage: glance help
+
+usage: glance image-list
+
+usage: glance image-download --file <file> [--help] --id <id> --name <name>
+options:
+        file <file>   Download location
+        help          Help
+        id <id>       Image Id
+        name <name>   Downloaded file name
+
+usage: glance image-create --file <file> [--help] --name <name>
+options:
+        file <file>   Image location
+        help          Help
+        name <name>   Image name
 ```
 ###### Nova Commands
 ```
-nova help
-nova start <serverId>
-nova stop <serverId>
-nova restart <serverId>
-nova download <serverId> <downloadlocation> <name>
-nova flavor-list
-nova boot <imageId> <flavorId> <netId> <name>
-nova boot-volume <volumeId> <flavorId> <netId> <name>
-nova delete <serverId>
-nova status <serverId>
-nova snapshot <serverId> <name>
+usage: nova help
+
+usage: nova start [--help] --id <id>
+options:
+        help      Help
+        id <id>   Server Id
+        
+usage: nova stop [--help] --id <id>
+options:
+        help      Help
+        id <id>   Server Id
+        
+usage: nova restart [--help] --id <id>
+options:
+        help      Help
+        id <id>   Server Id
+        
+usage: nova download --file <file> [--help] --id <id> --name <name>
+options:
+        file <file>   Download location
+        help          Help
+        id <id>       Server Id
+        name <name>   Name of download file
+        
+usage: nova flavor-list
+
+usage: nova boot --flavorid <flavorid> [--help] --imgid <imgid> --name <name> --netid <netid>
+options:
+        flavorid <flavorid>   Flavor Id
+        help                  Help
+        imgid <imgid>         Image Id
+        name <name>           Name of server
+        netid <netid>         Network Id
+        
+usage: nova boot-default [--help] --imgid <imgid> --name <name>
+options:
+        help            Help
+        imgid <imgid>   Image Id
+        name <name>     Name of server
+        
+        
+usage: nova boot-custom --cidr <cidr> --disk <disk> [--help] --imgid <imgid> --name <name> --ram <ram> --vcpu <vcpu>
+options:
+        cidr <cidr>     Network CIDR
+        disk <disk>     Disk size
+        help            Help
+        imgid <imgid>   Image Id
+        name <name>     Name of server
+        ram <ram>       Ram size
+        vcpu <vcpu>     VCPU size
+        
+usage: nova boot-volume --flavorid <flavorid> [--help] --name <name> --netid <netid> --volumeid <volumeid>
+options:
+        flavorid <flavorid>   Flavor Id
+        help                  Help
+        name <name>           Name of server
+        netid <netid>         Network Id
+        volumeid <volumeid>   Volume Id
+        
+usage: nova boot-volume-default [--help] --name <name> --volumeid <volumeid>
+options:
+        help                  Help
+        name <name>           Name of server
+        volumeid <volumeid>   Volume Id
+
+usage: nova boot-volume-custom --cidr <cidr> --disk <disk> [--help] --name <name> --ram <ram> --vcpu <vcpu> --volumeid <volumeid>
+options:
+        cidr <cidr>           Network CIDR
+        disk <disk>           Disk size
+        help                  Help
+        name <name>           Name of server
+        ram <ram>             Ram size
+        vcpu <vcpu>           VCPU size
+        volumeid <volumeid>   Volume Id
+               
+usage: nova delete [--help] --id <id>
+options:
+        help      Help
+        id <id>   Server Id
+        
+usage: nova status [--help] --id <id>
+options:
+        help      Help
+        id <id>   Server Id
+        
+usage: nova snapshot [--help] --id <id> --name <name>
+options:
+        help          Help
+        id <id>       Server Id
+        name <name>   Name of snapshot
+        
+usage: nova list
+
+usage: nova show [--help] --id <id>
+options:
+        help      Help
+        id <id>   Server Id
+
 ```
 
 ###### Neutron Commands
 ```
-neutron help
-neutron net-list
+usage: neutron help
+
+usage: neutron net-list
+
+usage: neutron net-show [--help] --id <id>
+options:
+        help      Help
+        id <id>   Network Id
+        
+usage: neutron net-create [--help] --name <name>
+options:
+        help          Help
+        name <name>   Network name
+        
+usage: neutron net-delete [--help] --id <id>
+options:
+        help      Help
+        id <id>   Network Id
+        
+usage: neutron router-create [--help] --name <name>
+options:
+        help          Help
+        name <name>   Router name
+        
+usage: neutron router-delete [--help] --id <id>
+options:
+        help      Help
+        id <id>   Router Id
+
+usage: neutron router-list
+
+usage: neutron router-show [--help] --id <id>
+options:
+        help      Help
+        id <id>   Router Id
+        
+usage: neutron router-interface-add [--help] --id <id> --subnetid <subnetid>
+options:
+        help                  Help
+        id <id>               Router Id
+        subnetid <subnetid>   Subnet Id
+        
+usage: neutron router-interface-delete [--help] --id <id>
+options:
+        help      Help
+        id <id>   Router Id
+        
+usage: neutron net-create-default [--help] --name <name>
+options:
+        help          Help
+        name <name>   Name of the network
+
 ```
 ###### Cinder Commands
 ```
-cinder help
-cinder create <size-in-gb> <name>
-cinder create-from-image <imageId> <size-in-gb> <name>
-cinder create-from-volume-snapshot <snapshotId> <size-in-gb> <name>
-cinder list
-cinder show <volumeId>
-cinder volume-attach <serverId> <volumeId>
-cinder volume-dettach <serverId> <volumeId>
-cinder delete <volumeId>
-cinder upload-to-image <volumeId> <name>
+usage: cinder help
+
+usage: cinder create [--help] --name <name> --size <size>
+options:
+        help          Help
+        name <name>   Volume name
+        size <size>   Size in GB
+        
+usage: cinder create-from-image [--help] --id <id> --name <name> --size <size>
+options:
+        help          Help
+        id <id>       Image Id
+        name <name>   Name
+        size <size>   Expected volume size in GB
+        
+usage: cinder create-from-volume-snapshot [--help] --id <id> --name <name> --size <size>
+options:
+        help          Help
+        id <id>       Snapshot Id
+        name <name>   Name
+        size <size>   Expected volume size in GB
+        
+usage: cinder list
+
+usage: cinder show [--help] --id <id>
+options:
+        help      Help
+        id <id>   Volume Id
+        
+usage: cinder delete [--help] --id <id>
+options:
+        help      Help
+        id <id>   Volume Id
+        
+usage: cinder upload-to-image [--help] --id <id> --name <name>
+options:
+        help          Help
+        id <id>       Volume Id
+        name <name>   image name
+        
 ```
 ###### Delete Commands
 ```
-delete tenant-all-instances
-delete tenant-all-volumes
-delete tenant-all-volume-snapshots
-delete tenant-all-images
-delete tenant-all-networks
-delete tenant-all-routers
-delete tenant-all-security-group-rules
-delete tenant-info
+usage: delete tenant-all-instances
+
+usage: delete tenant-all-volumes
+
+usage: delete tenant-all-volume-snapshots
+
+usage: delete tenant-all-images
+
+usage: delete tenant-all-networks
+
+usage: delete tenant-all-routers
+
+usage: delete tenant-all-security-group-rules
+
+usage: delete tenant-info
+
 ```
 
 

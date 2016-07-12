@@ -1,9 +1,8 @@
-/**
- * @author viborole
- */
+
 package com.vinodborole.openstack4j.app;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -12,14 +11,24 @@ import org.openstack4j.api.OSClient;
 import org.openstack4j.model.common.Identifier;
 import org.openstack4j.openstack.OSFactory;
 
-
+/**
+ * Creates and maintains the session information with Openstack cloud
+ * 
+ * @author vinod borole
+ */
 public class Osp4jSession {
     private static final Properties configprop = new Properties();
+    private static OSClient os;
     public static void loadProperties(String propertyFilePath){
-        InputStream inputStream = null;
-        try {
-            System.out.println(propertyFilePath);
-            inputStream = new FileInputStream(propertyFilePath);
+        System.out.println(propertyFilePath);
+        try{
+            readProp(propertyFilePath);
+        }catch(Exception e){
+            System.err.println(e.getMessage());
+        }
+    }
+    private static void readProp(String propertyFilePath) throws IOException, FileNotFoundException {
+        try(InputStream inputStream = new FileInputStream(propertyFilePath)){
             if (inputStream != null) {
                 System.out.println("Loading Properties...");
                 configprop.load(inputStream);
@@ -27,22 +36,15 @@ public class Osp4jSession {
             }else{
                 System.err.println("Invalid properties file!");
             }
-        } catch (final Exception e) {
-            System.err.println("Exception: "+e.getMessage());
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (final IOException e) {
-                    System.err.println("Exception: "+e.getMessage());
-                }
-            }
         }
     }
     public static Properties getConfigProperties(){
         return configprop;
     }
     public static OSClient getOspSession(){
+        if(os!=null){
+            return os;
+        }
         if(configprop.size()>1){
             String loggingEnabled = configprop.getProperty("OS_ENABLE_LOGGING");
             Boolean isLoggingEnabled=new Boolean(loggingEnabled);
@@ -61,7 +63,6 @@ public class Osp4jSession {
     }
     
     private static OSClient buildOSClient() {
-        OSClient os=null;
         String sslEnabled=configprop.getProperty("OS_ENABLE_SSL");
         Boolean isSSLEnabled = new Boolean(sslEnabled); 
         String v3Authentication=configprop.getProperty("OS_ENABLE_V3_AUTHENTICATION");
@@ -71,7 +72,7 @@ public class Osp4jSession {
                 .credentials(configprop.getProperty("OS_USERNAME"), configprop.getProperty("OS_PASSWORD"), Identifier.byName(configprop.getProperty("OS_DOMAIN"))).endpoint(configprop.getProperty("OS_AUTH_URL"))
                 .authenticate();
         else
-            os = OSFactory.builder().endpoint(configprop.getProperty("OS_AUTH_URL")).credentials(configprop.getProperty("OS_USERNAME"), configprop.getProperty("OS_PASSWORD")).tenantId(configprop.getProperty("OS_TENANT_ID")).useNonStrictSSLClient(isSSLEnabled).authenticate();
+            os = OSFactory.builderV2().endpoint(configprop.getProperty("OS_AUTH_URL")).credentials(configprop.getProperty("OS_USERNAME"), configprop.getProperty("OS_PASSWORD")).tenantId(configprop.getProperty("OS_TENANT_ID")).useNonStrictSSLClient(isSSLEnabled).authenticate();
         
         return os;
     }

@@ -1,6 +1,3 @@
-/**
- * @author viborole
- */
 package com.vinodborole.openstack4j.app.api;
 
 import java.io.File;
@@ -20,7 +17,11 @@ import org.openstack4j.model.image.Image;
 import com.vinodborole.openstack4j.app.Osp4jSession;
 import com.vinodborole.openstack4j.app.utils.TableBuilder;
 
-
+/**
+ * Glance API
+ *  
+ * @author vinod borole
+ */
 public class GlanceAPI { 
     
     protected enum GlanceKey{
@@ -70,17 +71,17 @@ public class GlanceAPI {
         return false;
     }
     
-    public static Image getImageDetail(String imageId){
+    public static Image getImageDetail(String imageId) throws Exception{
         imageId=CommonAPI.takeFromMemory(GlanceKey.IMAGE_ID,imageId);
         OSClient os=Osp4jSession.getOspSession();
         return os.images().get(imageId);
     }
      
-    public static void delete(String id) {
+    public static void delete(String id) throws Exception {
         OSClient os=Osp4jSession.getOspSession();
         os.images().delete(id);
     }      
-    public static List<? extends Image> imageList(){
+    public static List<? extends Image> imageList() throws Exception{
         OSClient os=Osp4jSession.getOspSession();
         final List<? extends Image> images = os.images().list();
         return images;
@@ -109,7 +110,13 @@ public class GlanceAPI {
         return tb;
      }
     private static void addImageRow(TableBuilder tb,Image image){
-        tb.addRow(image.getId(),image.getName(),image.getStatus().toString(),readableFileSize(image.getSize()),image.getContainerFormat().toString(),String.valueOf(image.isPublic()));
+        String id = image.getId();
+        String name = image.getName();
+        String status = image.getStatus()!=null?image.getStatus().toString():"NA";
+        String readableFileSize = readableFileSize(image.getSize()!=null?image.getSize():0l);
+        String containerFormat = image.getContainerFormat()!=null?image.getContainerFormat().toString():"NA";
+        String isPublic = String.valueOf(image.isPublic());
+        tb.addRow(id,name,status,readableFileSize,containerFormat,isPublic);
     }
 
     public static String readableFileSize(long size) {

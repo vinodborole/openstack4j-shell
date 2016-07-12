@@ -1,13 +1,14 @@
-/**
- * @author viborole
- */
 package com.vinodborole.openstack4j.app.api;
 
+/**
+ * Shell memory API's
+ *  
+ * @author vinod borole
+ */
+public interface IShellMemory<T, V> {
 
-public interface IShellMemory<T> {
-
-    public void addToMemory(T key, String value);
-    public String getFromMemory(T key);
+    public void addToMemory(T key, V value);
+    public V getFromMemory(T key);
     public void removeFromMemory(T key);
     public void flushMemory();
 }
