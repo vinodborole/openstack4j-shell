@@ -7,7 +7,7 @@ Ability to execute openstack4j api's through shell
 
 ## Download:
 
-Download [openstack4j-shell] (http://www.vinodborole.com/projects/openstack4j-shell/openstack4j-shell.jar)
+Download [openstack4j-shell] (http://vinodborole.github.io/openstack4j-shell/)
 
 ## Bug Reports:
 
